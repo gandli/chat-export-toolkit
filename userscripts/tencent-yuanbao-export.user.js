@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         腾讯元宝导出增强版（批量导出全部会话）
 // @namespace    https://github.com/gandli/chat-export-toolkit
-// @version      1.1.3
+// @version      1.1.4
 // @description  支持单会话导出 + 批量导出左侧全部会话（LLM Friendly Markdown/JSON）
 // @author       gandli
 // @match        *://yuanbao.tencent.com/*
@@ -28,6 +28,7 @@
     betweenChatMs: 500,
     maxChats: 500,
     toolbarAnchorSelector: '.agent-dialogue__tool',
+    toolbarAnchorXPath: '//*[@id="app"]/div/div[5]/div/div/div[1]/div/div[1]/div/div[4]',
   };
 
   const SEL = {
@@ -432,6 +433,26 @@
     console.log('[Yuanbao Batch Export Report]', report);
   }
 
+  function findAnchor() {
+    const byCss = document.querySelector(CFG.toolbarAnchorSelector);
+    if (byCss) return byCss;
+    if (CFG.toolbarAnchorXPath) {
+      try {
+        const found = document.evaluate(
+          CFG.toolbarAnchorXPath,
+          document,
+          null,
+          XPathResult.FIRST_ORDERED_NODE_TYPE,
+          null
+        ).singleNodeValue;
+        if (found) return found;
+      } catch (e) {
+        console.warn('[Yuanbao Export] XPath anchor lookup failed:', e);
+      }
+    }
+    return null;
+  }
+
   function ensureButtonHost() {
     const hostId = 'yb-export-host';
     let host = document.getElementById(hostId);
@@ -440,7 +461,7 @@
     host = document.createElement('div');
     host.id = hostId;
 
-    const anchor = document.querySelector(CFG.toolbarAnchorSelector);
+    const anchor = findAnchor();
     if (anchor && anchor.parentElement) {
       Object.assign(host.style, {
         display: 'flex',
