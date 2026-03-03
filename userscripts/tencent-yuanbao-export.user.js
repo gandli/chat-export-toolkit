@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         腾讯元宝导出增强版（批量导出全部会话）
 // @namespace    https://github.com/gandli/chat-export-toolkit
-// @version      1.1.4
+// @version      1.1.5
 // @description  支持单会话导出 + 批量导出左侧全部会话（LLM Friendly Markdown/JSON）
 // @author       gandli
 // @match        *://yuanbao.tencent.com/*
@@ -29,6 +29,7 @@
     maxChats: 500,
     toolbarAnchorSelector: '.agent-dialogue__tool',
     toolbarAnchorXPath: '//*[@id="app"]/div/div[5]/div/div/div[1]/div/div[1]/div/div[4]',
+    sidebarXPath: '//*[@id="app"]//aside',
   };
 
   const SEL = {
@@ -337,16 +338,55 @@
     return { title, turns: turns.length, base };
   }
 
-  function getSidebar() { return firstExisting(SEL.sidebar); }
+  function findByXPath(xpath) {
+    try {
+      return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    } catch {
+      return null;
+    }
+  }
+
+  function findSidebarByHeuristic() {
+    const candidates = Array.from(document.querySelectorAll('aside, nav, div')).filter(el => {
+      const r = el.getBoundingClientRect();
+      if (r.width < 180 || r.height < 200) return false;
+      if (r.left > window.innerWidth * 0.45) return false; // 只看左侧
+      const clickable = el.querySelectorAll('a,button,[role="button"],li,div').length;
+      return clickable >= 20;
+    });
+    return candidates[0] || null;
+  }
+
+  function getSidebar() {
+    return firstExisting(SEL.sidebar) || findByXPath(CFG.sidebarXPath) || findSidebarByHeuristic();
+  }
 
   function getSidebarItems() {
     const sidebar = getSidebar() || document;
     let items = allExisting(SEL.sidebarItems, sidebar);
+
+    if (!items.length) {
+      // 兜底：在 sidebar 内抓可点击且有文本的项
+      items = Array.from(sidebar.querySelectorAll('a,button,[role="button"],li,div'));
+    }
+
     items = items.filter(el => {
       const r = el.getBoundingClientRect();
       const label = text(el);
-      return r.width > 0 && r.height > 0 && label.length > 0;
+      return r.width > 0 && r.height > 0 && label.length > 1;
     });
+
+    // 去掉明显的工具按钮（太短/重复）
+    const seen = new Set();
+    items = items.filter(el => {
+      const label = normalizeText(text(el)).slice(0, 80);
+      if (!label || label.length < 2) return false;
+      const key = `${label}|${Math.round(el.getBoundingClientRect().top)}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
     return items;
   }
 
@@ -394,7 +434,9 @@
     const seen = new Set();
     const tasks = snapshot.filter(x => (seen.has(x.key) ? false : (seen.add(x.key), true)));
     if (!tasks.length) {
-      toast('未识别到左侧会话列表');
+      const sidebar = getSidebar();
+      console.warn('[Yuanbao Export] sidebar not detected', { sidebar, selectors: SEL.sidebar });
+      toast('未识别左侧会话列表（已记录调试日志）');
       return;
     }
 
