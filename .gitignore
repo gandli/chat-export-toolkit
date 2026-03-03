@@ -1,0 +1,73 @@
+# Tampermonkey Userscript Development .gitignore
+
+# User script files
+*.user.js
+*.user.js.bak
+*.meta.js
+*.meta.js.bak
+
+# Development files
+*.dev.js
+*.test.js
+*.spec.js
+*.local.js
+*.debug.js
+
+# Build artifacts
+dist/
+build/
+output/
+*.min.js
+*.bundle.js
+*.min.user.js
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*~
+.project
+.settings/
+
+# Node.js dependencies
+node_modules/
+
+# npm/yarn logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+
+# Local config files
+config.local.js
+settings.local.js
+
+# Documentation
+*.user.js.doc
+docs/build/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# SKILLS
+.*/skills/
+skills-lock.json
