@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         腾讯元宝导出增强版（批量导出全部会话）
 // @namespace    https://github.com/gandli/chat-export-toolkit
-// @version      1.1.2
+// @version      1.1.3
 // @description  支持单会话导出 + 批量导出左侧全部会话（LLM Friendly Markdown/JSON）
 // @author       gandli
 // @match        *://yuanbao.tencent.com/*
@@ -27,6 +27,7 @@
     perChatWaitMs: 1400,
     betweenChatMs: 500,
     maxChats: 500,
+    toolbarAnchorSelector: '.agent-dialogue__tool',
   };
 
   const SEL = {
@@ -431,19 +432,55 @@
     console.log('[Yuanbao Batch Export Report]', report);
   }
 
+  function ensureButtonHost() {
+    const hostId = 'yb-export-host';
+    let host = document.getElementById(hostId);
+    if (host) return host;
+
+    host = document.createElement('div');
+    host.id = hostId;
+
+    const anchor = document.querySelector(CFG.toolbarAnchorSelector);
+    if (anchor && anchor.parentElement) {
+      Object.assign(host.style, {
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '8px',
+        marginTop: '8px',
+        justifyContent: 'flex-end',
+      });
+      anchor.insertAdjacentElement('afterend', host);
+    } else {
+      Object.assign(host.style, {
+        position: 'fixed',
+        right: `${CFG.buttonRight}px`,
+        bottom: `${CFG.buttonBottom}px`,
+        zIndex: 9999999,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+        alignItems: 'flex-end',
+      });
+      document.body.appendChild(host);
+    }
+
+    return host;
+  }
+
   function makeBtn(id, textLabel, bg, bottomOffset, onClick) {
     if (document.getElementById(id)) return;
     const btn = document.createElement('button');
     btn.id = id;
     btn.textContent = textLabel;
     Object.assign(btn.style, {
-      position: 'fixed', right: `${CFG.buttonRight}px`, bottom: `${CFG.buttonBottom + bottomOffset}px`,
-      zIndex: 9999999, padding: '9px 12px', border: 'none', borderRadius: '10px',
+      padding: '8px 12px', border: 'none', borderRadius: '10px',
       background: bg, color: '#fff', fontSize: '13px', cursor: 'pointer',
       boxShadow: '0 3px 10px rgba(0,0,0,.2)', opacity: '.95'
     });
     btn.addEventListener('click', onClick);
-    document.body.appendChild(btn);
+
+    const host = ensureButtonHost();
+    host.appendChild(btn);
   }
 
   function mountUI() {
