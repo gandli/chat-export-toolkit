@@ -22,9 +22,9 @@
     discovered: false,
   };
 
-  // 正则表达式用于拦截响应（支持任意版本 v\d+）
-  const YUANBAO_DETAIL_RE = /\/api\/(?:user\/agent\/)?conversation\/v\d+\/detail/;
-  const YUANBAO_LIST_RE = /\/api\/(?:user\/agent\/)?conversation\/v\d+\/(?:list|page|list_page)/;
+  // 正则表达式用于拦截响应（支持任意版本 v\d+ 和新结构）
+  const YUANBAO_DETAIL_RE = /\/api\/(?:user\/agent\/)?conversation\/v?\d*\/?detail/;
+  const YUANBAO_LIST_RE = /\/api\/(?:user\/agent\/)?conversation\/v?\d*\/?(?:list|page|list_page)/;
 
   const state = {
     current: null,
@@ -411,80 +411,100 @@
   async function discoverApiEndpoints() {
     if (API_ENDPOINTS.discovered) return API_ENDPOINTS;
 
+    // 首先尝试从已拦截的请求中选择端点
     const endpoints = {
-      detail: null,
-      list: null,
+      detail: selectBestEndpoint('detail'),
+      list: selectBestEndpoint('list'),
     };
 
     try {
-      // 1. 从页面 JS 资源中提取 API 端点
-      const scripts = Array.from(document.querySelectorAll('script[src]'));
-      const jsUrls = scripts.map(s => s.src).filter(src => src.includes('.js'));
-
-      // 2. 同时检查内联脚本
-      const inlineScripts = Array.from(document.querySelectorAll('script:not([src])'));
-      const inlineContents = inlineScripts.map(s => s.textContent).filter(Boolean);
-
-      // 3. 从 JS 文件内容中提取 API 模式
-      const apiPatterns = [
-        /["'`]\/api\/(?:user\/agent\/)?conversation\/v\d+\/detail["'`]/g,
-        /["'`]\/api\/(?:user\/agent\/)?conversation\/v\d+\/(?:list|page|list_page)["'`]/g,
-        /["'`]\/api\/conversation\/v\d+\/detail["'`]/g,
-        /["'`]\/api\/conversation\/v\d+\/(?:list|page|list_page)["'`]/g,
-      ];
-
-      // 4. 尝试从内联脚本中提取
-      for (const content of inlineContents) {
-        for (const pattern of apiPatterns) {
-          const matches = content.match(pattern);
-          if (matches) {
-            for (const match of matches) {
-              const path = match.replace(/["'`]/g, '');
-              if (path.includes('/detail') && !endpoints.detail) {
-                endpoints.detail = path;
-              } else if (path.includes('/list') || path.includes('/page') || path.includes('/list_page')) {
-                if (!endpoints.list || path.includes('/list')) {
-                  endpoints.list = path;
-                }
-              }
-            }
-          }
-        }
-      }
-
-      // 5. 如果内联脚本没有找到，尝试从外部 JS 文件提取（采样前 5 个）
+      // 如果从拦截请求中没有找到端点，则尝试从页面 JS 资源中提取
       if (!endpoints.detail || !endpoints.list) {
-        const sampleScripts = jsUrls.slice(0, 5);
-        for (const scriptUrl of sampleScripts) {
-          try {
-            const response = await fetch(scriptUrl, { signal: AbortSignal.timeout(3000) });
-            const text = await response.text();
+        const scripts = Array.from(document.querySelectorAll('script[src]'));
+        const jsUrls = scripts.map(s => s.src).filter(src => src.includes('.js'));
 
-            for (const pattern of apiPatterns) {
-              const matches = text.match(pattern);
-              if (matches) {
-                for (const match of matches) {
-                  const path = match.replace(/["'`]/g, '');
-                  if (path.includes('/detail') && !endpoints.detail) {
-                    endpoints.detail = path;
-                  } else if ((path.includes('/list') || path.includes('/page')) && !endpoints.list) {
+        // 检查内联脚本
+        const inlineScripts = Array.from(document.querySelectorAll('script:not([src])'));
+        const inlineContents = inlineScripts.map(s => s.textContent).filter(Boolean);
+
+        // 从 JS 文件内容中提取 API 模式 - 使用更广泛的模式
+        const apiPatterns = [
+          /["'`]\/api\/[^"']*conversation[^"']*detail["'`]/gi,
+          /["'`]\/api\/[^"']*conversation[^"']*\/(?:list|page|list_page)["'`]/gi,
+          /["'`]\/api\/[^"']*\/detail["'`]/gi,
+          /["'`]\/api\/[^"']*\/(?:list|page|list_page)["'`]/gi,
+        ];
+
+        // 尝试从内联脚本中提取
+        for (const content of inlineContents) {
+          for (const pattern of apiPatterns) {
+            const matches = content.match(pattern);
+            if (matches) {
+              for (const match of matches) {
+                const path = match.replace(/["'`]/g, '');
+                if (path.includes('/detail') && !endpoints.detail) {
+                  endpoints.detail = path;
+                  console.log('[Chat Export] Found detail API in inline script:', path);
+                } else if (path.includes('/list') || path.includes('/page') || path.includes('/list_page')) {
+                  if (!endpoints.list || path.includes('/list')) {
                     endpoints.list = path;
+                    console.log('[Chat Export] Found list API in inline script:', path);
                   }
                 }
               }
             }
-
-            if (endpoints.detail && endpoints.list) break;
-          } catch (err) {
-            console.log('[Chat Export] Failed to load JS file:', scriptUrl, err?.message);
           }
         }
+
+        // 如果内联脚本没有找到，尝试从外部 JS 文件提取（采样前 5 个）
+        if (!endpoints.detail || !endpoints.list) {
+          const sampleScripts = jsUrls.slice(0, 5);
+          for (const scriptUrl of sampleScripts) {
+            try {
+              const response = await fetch(scriptUrl, { signal: AbortSignal.timeout(3000) });
+              const text = await response.text();
+
+              for (const pattern of apiPatterns) {
+                const matches = text.match(pattern);
+                if (matches) {
+                  for (const match of matches) {
+                    const path = match.replace(/["'`]/g, '');
+                    if (path.includes('/detail') && !endpoints.detail) {
+                      endpoints.detail = path;
+                      console.log('[Chat Export] Found detail API in external script:', path);
+                    } else if ((path.includes('/list') || path.includes('/page')) && !endpoints.list) {
+                      endpoints.list = path;
+                      console.log('[Chat Export] Found list API in external script:', path);
+                    }
+                  }
+                }
+              }
+
+              if (endpoints.detail && endpoints.list) break;
+            } catch (err) {
+              console.log('[Chat Export] Failed to load JS file:', scriptUrl, err?.message);
+            }
+          }
+        }
+      }
+      
+      // 检查拦截到的API请求
+      if (!endpoints.detail && state.captured.size > 0) {
+        // 如果已经有捕获的对话，尝试从中推断API端点
+        const capturedEntry = state.captured.entries().next().value;
+        if (capturedEntry) {
+          // 这里可以尝试反向推断API端点，但需要更多信息
+        }
+      }
+      
+      if (!endpoints.list && state.listHints.size > 0) {
+        // 如果已经有列表提示，尝试从中推断API端点
       }
     } catch (err) {
       console.log('[Chat Export] API discovery error:', err?.message);
     }
 
-    // 6. 如果动态发现失败，使用回退端点（带版本探测）
+    // 如果仍然没有找到端点，使用回退探测
     if (!endpoints.detail) {
       console.log('[Chat Export] Using fallback probe for detail API');
       endpoints.detail = await probeDetailApi();
@@ -494,7 +514,7 @@
       endpoints.list = await probeListApi();
     }
 
-    console.log('[Chat Export] Discovered API endpoints:', API_ENDPOINTS);
+    console.log('[Chat Export] Discovered API endpoints:', endpoints);
     API_ENDPOINTS = { ...endpoints, discovered: true };
     return API_ENDPOINTS;
   }
@@ -506,6 +526,13 @@
       '/api/user/agent/conversation/v1/detail',
       '/api/conversation/v2/detail',
       '/api/conversation/v1/detail',
+      // 新增可能的端点模式
+      '/api/user/agent/conversation/detail',
+      '/api/conversation/detail',
+      '/api/v1/user/agent/conversation/detail',
+      '/api/v2/user/agent/conversation/detail',
+      '/api/conversation/detail/v1',
+      '/api/conversation/detail/v2',
     ];
 
     for (const endpoint of candidates) {
@@ -536,6 +563,19 @@
       '/api/user/agent/conversation/v1/page',
       '/api/conversation/v2/list',
       '/api/conversation/v1/list',
+      // 新增可能的端点模式
+      '/api/user/agent/conversation/list',
+      '/api/user/agent/conversation/page',
+      '/api/conversation/list',
+      '/api/conversation/page',
+      '/api/v1/user/agent/conversation/list',
+      '/api/v2/user/agent/conversation/list',
+      '/api/v1/user/agent/conversation/page',
+      '/api/v2/user/agent/conversation/page',
+      '/api/conversation/list/v1',
+      '/api/conversation/list/v2',
+      '/api/conversation/page/v1',
+      '/api/conversation/page/v2',
     ];
 
     for (const endpoint of candidates) {
@@ -579,7 +619,20 @@
       '/api/conversation/v2/list',
       '/api/conversation/v2/page',
       '/api/conversation/v1/list',
-      '/api/conversation/v1/page'
+      '/api/conversation/v1/page',
+      // 新增可能的端点
+      '/api/user/agent/conversation/list',
+      '/api/user/agent/conversation/page',
+      '/api/conversation/list',
+      '/api/conversation/page',
+      '/api/v1/user/agent/conversation/list',
+      '/api/v2/user/agent/conversation/list',
+      '/api/v1/user/agent/conversation/page',
+      '/api/v2/user/agent/conversation/page',
+      '/api/conversation/list/v1',
+      '/api/conversation/list/v2',
+      '/api/conversation/page/v1',
+      '/api/conversation/page/v2',
     );
 
     // 去重
@@ -594,6 +647,11 @@
           `${base}?pageNum=${page}&pageSize=50`,
           `${base}?offset=${(page - 1) * 50}&limit=50`,
           `${base}?cursor=${encodeURIComponent(String(page))}&size=50`,
+          // 新增可能的参数格式
+          `${base}?page=${page}&size=50`,
+          `${base}?pageIndex=${page}&pageSize=50`,
+          `${base}?skip=${(page - 1) * 50}&limit=50`,
+          `${base}?start=${(page - 1) * 50}&count=50`,
         ];
 
         const postCandidates = [
@@ -601,6 +659,11 @@
           { pageNum: page, pageSize: 50 },
           { offset: (page - 1) * 50, limit: 50 },
           { cursor: String(page), size: 50 },
+          // 新增可能的参数格式
+          { page, size: 50 },
+          { pageIndex: page, pageSize: 50 },
+          { skip: (page - 1) * 50, limit: 50 },
+          { start: (page - 1) * 50, count: 50 },
         ];
 
         let before = all.length;
@@ -632,7 +695,19 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body),
               });
-              collectConversationMetasFromJson(json, all, seen);
+              // 尝试更多可能的数据结构
+              const conversations = 
+                pickArray(json, ['conversations', 'data', 'result', 'response', 'payload']) ||
+                pickArray(json?.data, ['conversations', 'result', 'response', 'payload']) ||
+                pickArray(json?.result, ['conversations', 'data', 'response', 'payload']) ||
+                pickArray(json?.response, ['conversations', 'data', 'result', 'payload']) ||
+                pickArray(json?.payload, ['conversations', 'data', 'result', 'response']);
+              
+              if (conversations.length > 0) {
+                collectConversationMetasFromJson(conversations, all, seen);
+              } else {
+                collectConversationMetasFromJson(json, all, seen);
+              }
               hit = true;
               if (all.length > before) break;
             } catch {
@@ -682,6 +757,11 @@
       { sessionId: id },
       { chatId: id },
       { id },
+      // 新增可能的参数格式
+      { conversation_uuid: id },
+      { conversationUuid: id },
+      { session_id: id },
+      { chat_id: id },
     ];
 
     // 构建候选端点列表：动态发现的端点优先
@@ -694,7 +774,14 @@
       '/api/user/agent/conversation/v2/detail',
       '/api/user/agent/conversation/v1/detail',
       '/api/conversation/v2/detail',
-      '/api/conversation/v1/detail'
+      '/api/conversation/v1/detail',
+      // 新增可能的端点
+      '/api/user/agent/conversation/detail',
+      '/api/conversation/detail',
+      '/api/v1/user/agent/conversation/detail',
+      '/api/v2/user/agent/conversation/detail',
+      '/api/conversation/detail/v1',
+      '/api/conversation/detail/v2',
     );
 
     // 去重
@@ -708,9 +795,14 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
           });
+          // 检查更多可能的响应结构
           if (Array.isArray(json?.convs)) return json;
           if (Array.isArray(json?.data?.convs)) return json.data;
           if (Array.isArray(json?.result?.convs)) return json.result;
+          if (Array.isArray(json?.response?.convs)) return json.response;
+          if (Array.isArray(json?.payload?.convs)) return json.payload;
+          if (Array.isArray(json?.data?.data?.convs)) return json.data.data;
+          if (Array.isArray(json?.result?.result?.convs)) return json.result.result;
         } catch {
           // try next shape
         }
@@ -726,20 +818,32 @@
       '/api/user/agent/conversation/v2/detail',
       '/api/user/agent/conversation/v1/detail',
       '/api/conversation/v2/detail',
-      '/api/conversation/v1/detail'
+      '/api/conversation/v1/detail',
+      // 新增可能的端点
+      '/api/user/agent/conversation/detail',
+      '/api/conversation/detail',
+      '/api/v1/user/agent/conversation/detail',
+      '/api/v2/user/agent/conversation/detail',
+      '/api/conversation/detail/v1',
+      '/api/conversation/detail/v2',
     );
 
     const uniqueGetPaths = [...new Set(getBasePaths)];
-    const paramNames = ['conversationId', 'conversation_id', 'sessionId', 'chatId', 'id'];
+    const paramNames = ['conversationId', 'conversation_id', 'sessionId', 'chatId', 'id', 'conversation_uuid', 'conversationUuid', 'session_id', 'chat_id'];
 
     for (const basePath of uniqueGetPaths) {
       for (const paramName of paramNames) {
         const u = `${basePath}?${paramName}=${encodeURIComponent(id)}`;
         try {
           const json = await fetchJson(u);
+          // 检查更多可能的响应结构
           if (Array.isArray(json?.convs)) return json;
           if (Array.isArray(json?.data?.convs)) return json.data;
           if (Array.isArray(json?.result?.convs)) return json.result;
+          if (Array.isArray(json?.response?.convs)) return json.response;
+          if (Array.isArray(json?.payload?.convs)) return json.payload;
+          if (Array.isArray(json?.data?.data?.convs)) return json.data.data;
+          if (Array.isArray(json?.result?.result?.convs)) return json.result.result;
         } catch {
           // next
         }
@@ -1233,7 +1337,21 @@
 
     const tmp = [];
     const seen = new Set();
-    collectConversationMetasFromJson(json, tmp, seen);
+    
+    // 尝试更多可能的数据结构
+    const conversations = 
+      pickArray(json, ['conversations', 'data', 'result', 'response', 'payload']) ||
+      pickArray(json?.data, ['conversations', 'result', 'response', 'payload']) ||
+      pickArray(json?.result, ['conversations', 'data', 'response', 'payload']) ||
+      pickArray(json?.response, ['conversations', 'data', 'result', 'payload']) ||
+      pickArray(json?.payload, ['conversations', 'data', 'result', 'response']);
+    
+    if (conversations.length > 0) {
+      collectConversationMetasFromJson(conversations, tmp, seen);
+    } else {
+      collectConversationMetasFromJson(json, tmp, seen);
+    }
+    
     for (const row of tmp) {
       state.listHints.set(row.id, row.title);
     }
@@ -1247,23 +1365,47 @@
       return;
     }
 
-    if (!json || !Array.isArray(json.convs)) return;
+    // 检查更多可能的响应结构
+    let convsData = null;
+    if (Array.isArray(json.convs)) {
+      convsData = json;
+    } else if (Array.isArray(json?.data?.convs)) {
+      convsData = json.data;
+    } else if (Array.isArray(json?.result?.convs)) {
+      convsData = json.result;
+    } else if (Array.isArray(json?.response?.convs)) {
+      convsData = json.response;
+    } else if (Array.isArray(json?.payload?.convs)) {
+      convsData = json.payload;
+    } else if (Array.isArray(json?.data?.data?.convs)) {
+      convsData = json.data.data;
+    } else if (Array.isArray(json?.result?.result?.convs)) {
+      convsData = json.result.result;
+    }
+
+    if (!convsData) return;
 
     const idFromUrl = Utils.extractConversationId(url);
-    const title = json.sessionTitle || json.title || 'Yuanbao Chat';
+    const title = convsData.sessionTitle || convsData.title || json.sessionTitle || json.title || 'Yuanbao Chat';
     const id = idFromUrl || `${Utils.sanitizeFilename(title)}_${Utils.nowStamp()}`;
 
     state.listHints.set(id, title);
     state.current = {
       id,
       title,
-      md: yuanbaoToMarkdown(json),
+      md: yuanbaoToMarkdown(convsData),
       jsonText: text,
       capturedAt: new Date().toISOString(),
     };
     state.captured.set(id, state.current);
     updateUiState();
   }
+
+  // 存储已发现的API端点
+  let discoveredEndpoints = {
+    detail: new Set(),
+    list: new Set()
+  };
 
   function installInterceptors() {
     const originalOpen = XMLHttpRequest.prototype.open;
@@ -1273,6 +1415,20 @@
         () => {
           try {
             const url = this.responseURL || '';
+            
+            // 检查是否是腾讯元宝相关的API请求
+            if (url.includes('/conversation/')) {
+              // 记录所有conversation相关的端点
+              if (url.includes('/detail')) {
+                discoveredEndpoints.detail.add(url);
+                console.log('[Chat Export] Discovered detail API via XHR:', url);
+              } else if (url.includes('/list') || url.includes('/page')) {
+                discoveredEndpoints.list.add(url);
+                console.log('[Chat Export] Discovered list API via XHR:', url);
+              }
+            }
+            
+            // 检查是否是我们已知的模式
             if (YUANBAO_DETAIL_RE.test(url)) {
               console.log('[Chat Export] Intercepted detail API:', url);
               handleYuanbaoResponse(this.responseText, url);
@@ -1296,6 +1452,20 @@
       const res = await originalFetch(...args);
       try {
         const url = args[0] instanceof Request ? args[0].url : String(args[0] || '');
+        
+        // 检查是否是腾讯元宝相关的API请求
+        if (url.includes('/conversation/')) {
+          // 记录所有conversation相关的端点
+          if (url.includes('/detail')) {
+            discoveredEndpoints.detail.add(url);
+            console.log('[Chat Export] Discovered detail API via fetch:', url);
+          } else if (url.includes('/list') || url.includes('/page')) {
+            discoveredEndpoints.list.add(url);
+            console.log('[Chat Export] Discovered list API via fetch:', url);
+          }
+        }
+        
+        // 检查是否是我们已知的模式
         if (YUANBAO_DETAIL_RE.test(url)) {
           console.log('[Chat Export] Intercepted fetch detail API:', url);
           res
@@ -1316,6 +1486,21 @@
       }
       return res;
     };
+  }
+
+  // 从已发现的端点中选择最可能的API端点
+  function selectBestEndpoint(type) {
+    const candidates = Array.from(discoveredEndpoints[type]);
+    if (candidates.length === 0) return null;
+    
+    // 优先选择更具体的端点（包含版本号的）
+    const versionedEndpoints = candidates.filter(ep => /\/v\d+\//.test(ep));
+    if (versionedEndpoints.length > 0) {
+      return versionedEndpoints[0];
+    }
+    
+    // 否则返回第一个
+    return candidates[0];
   }
 
   let autoFetchStarted = false;
