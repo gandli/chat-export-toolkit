@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         腾讯元宝导出增强版（批量导出全部会话）
 // @namespace    https://github.com/gandli/chat-export-toolkit
-// @version      1.1.5
+// @version      1.1.6
 // @description  支持单会话导出 + 批量导出左侧全部会话（LLM Friendly Markdown/JSON）
 // @author       gandli
 // @match        *://yuanbao.tencent.com/*
@@ -315,16 +315,20 @@
     }
   }
 
-  async function exportCurrentChat(download = true) {
+  async function collectCurrentChatData() {
     await autoScrollTopCurrentChat();
     const title = pickTitle();
     const raw = extractMessages();
     const turns = pairTurns(raw);
     if (!turns.length) throw new Error('未提取到会话内容');
+    return { title, turns, raw };
+  }
 
-    const base = `${nowStamp()}-${safeName(title)}`;
-    const md = buildMD(title, turns);
-    const json = JSON.stringify(buildJSON(title, turns, raw), null, 2);
+  async function exportCurrentChat(download = true) {
+    const data = await collectCurrentChatData();
+    const base = `${nowStamp()}-${safeName(data.title)}`;
+    const md = buildMD(data.title, data.turns);
+    const json = JSON.stringify(buildJSON(data.title, data.turns, data.raw), null, 2);
 
     if (download) {
       downloadText(`${base}.md`, md, 'text/markdown;charset=utf-8');
@@ -335,7 +339,39 @@
       else throw new Error('剪贴板权限不可用');
     }
 
-    return { title, turns: turns.length, base };
+    return { title: data.title, turns: data.turns.length, base };
+  }
+
+  function buildBatchMD(conversations, results) {
+    let out = '';
+    out += `---\n`;
+    out += `source: tencent-yuanbao\n`;
+    out += `exported_at: ${isoWithTZ()}\n`;
+    out += `format: batch-markdown\n`;
+    out += `conversation_count: ${conversations.length}\n`;
+    out += `---\n\n`;
+    out += `# 腾讯元宝批量导出\n\n`;
+    out += `- 成功会话数: ${conversations.length}\n`;
+    out += `- 失败会话数: ${results.filter(x => !x.ok).length}\n\n`;
+
+    conversations.forEach((c, i) => {
+      out += `---\n\n`;
+      out += `## Conversation ${i + 1}: ${c.title}\n\n`;
+      out += buildMD(c.title, c.turns);
+      out += `\n`;
+    });
+
+    const failed = results.filter(x => !x.ok);
+    if (failed.length) {
+      out += `---\n\n`;
+      out += `## Failed Conversations\n\n`;
+      failed.forEach(f => {
+        out += `- [${f.index}] ${f.title}: ${f.error || 'unknown error'}\n`;
+      });
+      out += `\n`;
+    }
+
+    return out;
   }
 
   function findByXPath(xpath) {
@@ -443,6 +479,7 @@
     toast(`检测到 ${tasks.length} 个会话，开始导出...`);
 
     const results = [];
+    const conversations = [];
     for (let i = 0; i < tasks.length; i++) {
       const t = tasks[i];
       try {
@@ -451,9 +488,10 @@
 
         await sleep(CFG.perChatWaitMs);
 
-        const ret = await exportCurrentChat(true);
-        results.push({ index: i + 1, ok: true, title: ret.title, turns: ret.turns, file: ret.base });
-        toast(`(${i + 1}/${tasks.length}) 已导出：${ret.title}`);
+        const data = await collectCurrentChatData();
+        conversations.push({ title: data.title, turns: data.turns });
+        results.push({ index: i + 1, ok: true, title: data.title, turns: data.turns.length });
+        toast(`(${i + 1}/${tasks.length}) 已收集：${data.title}`);
       } catch (e) {
         results.push({ index: i + 1, ok: false, title: t.title, error: e?.message || String(e) });
         toast(`(${i + 1}/${tasks.length}) 失败：${t.title}`);
@@ -469,9 +507,11 @@
       failed: results.filter(x => !x.ok).length,
       results
     };
-    downloadText(`${nowStamp()}-batch-export-report.json`, JSON.stringify(report, null, 2), 'application/json;charset=utf-8');
 
-    toast(`批量完成：成功 ${report.success}，失败 ${report.failed}`);
+    const mergedMd = buildBatchMD(conversations, results);
+    downloadText(`${nowStamp()}-yuanbao-batch-all-in-one.md`, mergedMd, 'text/markdown;charset=utf-8');
+
+    toast(`批量完成：成功 ${report.success}，失败 ${report.failed}（已导出单文件）`);
     console.log('[Yuanbao Batch Export Report]', report);
   }
 
