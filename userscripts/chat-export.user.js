@@ -521,6 +521,16 @@
 
   // 探测 detail API 端点
   async function probeDetailApi() {
+    // 首先尝试使用已发现的端点
+    const knownEndpoint = selectBestEndpoint('detail');
+    if (knownEndpoint) {
+      // 提取路径部分（去掉域名）
+      const pathOnly = new URL(knownEndpoint, window.location.origin).pathname;
+      console.log('[Chat Export] Using known detail endpoint:', pathOnly);
+      return pathOnly;
+    }
+
+    // 如果没有已知端点，则尝试常见模式
     const candidates = [
       '/api/user/agent/conversation/v2/detail',
       '/api/user/agent/conversation/v1/detail',
@@ -544,7 +554,8 @@
           signal: AbortSignal.timeout(5000),
         });
         // 404 表示端点存在但参数错误，非 404 表示可能是正确端点
-        if (response.status !== 404) {
+        // 405 表示端点存在但方法不允许，也可能是正确端点
+        if (response.status !== 404 && response.status !== 405) {
           return endpoint;
         }
       } catch {
@@ -556,6 +567,15 @@
 
   // 探测 list API 端点
   async function probeListApi() {
+    // 首先尝试使用已发现的端点
+    const knownEndpoint = selectBestEndpoint('list');
+    if (knownEndpoint) {
+      // 提取路径部分（去掉域名）
+      const pathOnly = new URL(knownEndpoint, window.location.origin).pathname;
+      console.log('[Chat Export] Using known list endpoint:', pathOnly);
+      return pathOnly;
+    }
+
     const candidates = [
       '/api/user/agent/conversation/v2/list',
       '/api/user/agent/conversation/v2/page',
@@ -583,7 +603,8 @@
         const response = await fetch(`${endpoint}?page=1&pageSize=1`, {
           signal: AbortSignal.timeout(5000),
         });
-        if (response.status !== 404) {
+        // 404 表示端点存在但参数错误，405 表示方法不允许但端点存在
+        if (response.status !== 404 && response.status !== 405) {
           return endpoint;
         }
       } catch {
@@ -642,18 +663,6 @@
       let hit = false;
       // 增加分页上限到 200，但添加智能检测
       for (let page = 1; page <= 200; page += 1) {
-        const getCandidates = [
-          `${base}?page=${page}&pageSize=50`,
-          `${base}?pageNum=${page}&pageSize=50`,
-          `${base}?offset=${(page - 1) * 50}&limit=50`,
-          `${base}?cursor=${encodeURIComponent(String(page))}&size=50`,
-          // 新增可能的参数格式
-          `${base}?page=${page}&size=50`,
-          `${base}?pageIndex=${page}&pageSize=50`,
-          `${base}?skip=${(page - 1) * 50}&limit=50`,
-          `${base}?start=${(page - 1) * 50}&count=50`,
-        ];
-
         const postCandidates = [
           { page, pageSize: 50 },
           { pageNum: page, pageSize: 50 },
@@ -667,6 +676,51 @@
         ];
 
         let before = all.length;
+
+        // 优先尝试POST方法（腾讯元宝API主要是POST）
+        for (const body of postCandidates) {
+          try {
+            const json = await fetchJson(base, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+            });
+            // 尝试更多可能的数据结构
+            const conversations = 
+              pickArray(json, ['conversations', 'data', 'result', 'response', 'payload']) ||
+              pickArray(json?.data, ['conversations', 'result', 'response', 'payload']) ||
+              pickArray(json?.result, ['conversations', 'data', 'response', 'payload']) ||
+              pickArray(json?.response, ['conversations', 'data', 'result', 'payload']) ||
+              pickArray(json?.payload, ['conversations', 'data', 'result', 'response']);
+            
+            if (conversations.length > 0) {
+              collectConversationMetasFromJson(conversations, all, seen);
+            } else {
+              collectConversationMetasFromJson(json, all, seen);
+            }
+            hit = true;
+            if (all.length > before) break;
+          } catch (err) {
+            // 如果POST失败，记录错误但继续尝试其他参数
+            continue;
+          }
+        }
+
+        // 如果POST成功获取到数据，跳出循环
+        if (all.length > before) break;
+
+        // 如果POST方法失败，再尝试GET方法作为备选
+        const getCandidates = [
+          `${base}?page=${page}&pageSize=50`,
+          `${base}?pageNum=${page}&pageSize=50`,
+          `${base}?offset=${(page - 1) * 50}&limit=50`,
+          `${base}?cursor=${encodeURIComponent(String(page))}&size=50`,
+          // 新增可能的参数格式
+          `${base}?page=${page}&size=50`,
+          `${base}?pageIndex=${page}&pageSize=50`,
+          `${base}?skip=${(page - 1) * 50}&limit=50`,
+          `${base}?start=${(page - 1) * 50}&count=50`,
+        ];
 
         for (const u of getCandidates) {
           try {
@@ -682,36 +736,7 @@
           } catch (err) {
             // 记录第一个页面的错误用于调试
             if (page === 1 && err?.message?.includes('404')) {
-              console.log('[Chat Export] API endpoint failed:', u, err.message);
-            }
-          }
-        }
-
-        if (all.length === before) {
-          for (const body of postCandidates) {
-            try {
-              const json = await fetchJson(base, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body),
-              });
-              // 尝试更多可能的数据结构
-              const conversations = 
-                pickArray(json, ['conversations', 'data', 'result', 'response', 'payload']) ||
-                pickArray(json?.data, ['conversations', 'result', 'response', 'payload']) ||
-                pickArray(json?.result, ['conversations', 'data', 'response', 'payload']) ||
-                pickArray(json?.response, ['conversations', 'data', 'result', 'payload']) ||
-                pickArray(json?.payload, ['conversations', 'data', 'result', 'response']);
-              
-              if (conversations.length > 0) {
-                collectConversationMetasFromJson(conversations, all, seen);
-              } else {
-                collectConversationMetasFromJson(json, all, seen);
-              }
-              hit = true;
-              if (all.length > before) break;
-            } catch {
-              // next
+              console.log('[Chat Export] API endpoint failed (404):', u, err.message);
             }
           }
         }
@@ -787,6 +812,7 @@
     // 去重
     const uniquePaths = [...new Set(detailPaths)];
 
+    // 优先尝试POST方法（腾讯元宝API主要是POST）
     for (const path of uniquePaths) {
       for (const body of bodyCandidates) {
         try {
@@ -804,12 +830,13 @@
           if (Array.isArray(json?.data?.data?.convs)) return json.data.data;
           if (Array.isArray(json?.result?.result?.convs)) return json.result.result;
         } catch {
-          // try next shape
+          // 继续尝试下一个参数组合
+          continue;
         }
       }
     }
 
-    // GET 请求回退
+    // 如果POST方法失败，尝试GET方法作为回退
     const getBasePaths = [];
     if (detailEndpoint) {
       getBasePaths.push(detailEndpoint.split('?')[0]);
@@ -1410,32 +1437,35 @@
   function installInterceptors() {
     const originalOpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function (...args) {
+      const method = args[0];
+      const url = args[1];
+      
       this.addEventListener(
         'load',
         () => {
           try {
-            const url = this.responseURL || '';
+            const responseUrl = this.responseURL || url; // 使用原始URL或响应URL
             
             // 检查是否是腾讯元宝相关的API请求
-            if (url.includes('/conversation/')) {
-              // 记录所有conversation相关的端点
-              if (url.includes('/detail')) {
-                discoveredEndpoints.detail.add(url);
-                console.log('[Chat Export] Discovered detail API via XHR:', url);
-              } else if (url.includes('/list') || url.includes('/page')) {
-                discoveredEndpoints.list.add(url);
-                console.log('[Chat Export] Discovered list API via XHR:', url);
+            if (responseUrl.includes('/conversation/')) {
+              // 记录所有conversation相关的端点，不管是否成功
+              if (responseUrl.includes('/detail')) {
+                discoveredEndpoints.detail.add(responseUrl);
+                console.log('[Chat Export] Discovered detail API via XHR:', responseUrl, 'Status:', this.status);
+              } else if (responseUrl.includes('/list') || responseUrl.includes('/page')) {
+                discoveredEndpoints.list.add(responseUrl);
+                console.log('[Chat Export] Discovered list API via XHR:', responseUrl, 'Status:', this.status);
               }
             }
             
-            // 检查是否是我们已知的模式
-            if (YUANBAO_DETAIL_RE.test(url)) {
-              console.log('[Chat Export] Intercepted detail API:', url);
-              handleYuanbaoResponse(this.responseText, url);
+            // 检查是否是我们已知的模式，只处理成功的请求
+            if ((YUANBAO_DETAIL_RE.test(responseUrl) || discoveredEndpoints.detail.has(responseUrl)) && this.status === 200) {
+              console.log('[Chat Export] Intercepted detail API:', responseUrl);
+              handleYuanbaoResponse(this.responseText, responseUrl);
               return;
             }
-            if (YUANBAO_LIST_RE.test(url)) {
-              console.log('[Chat Export] Intercepted list API:', url);
+            if ((YUANBAO_LIST_RE.test(responseUrl) || discoveredEndpoints.list.has(responseUrl)) && this.status === 200) {
+              console.log('[Chat Export] Intercepted list API:', responseUrl);
               handleConversationListResponse(this.responseText);
             }
           } catch (err) {
@@ -1449,31 +1479,30 @@
 
     const originalFetch = window.fetch;
     window.fetch = async (...args) => {
+      const url = args[0] instanceof Request ? args[0].url : String(args[0] || '');
       const res = await originalFetch(...args);
       try {
-        const url = args[0] instanceof Request ? args[0].url : String(args[0] || '');
-        
         // 检查是否是腾讯元宝相关的API请求
         if (url.includes('/conversation/')) {
-          // 记录所有conversation相关的端点
+          // 记录所有conversation相关的端点，不管是否成功
           if (url.includes('/detail')) {
             discoveredEndpoints.detail.add(url);
-            console.log('[Chat Export] Discovered detail API via fetch:', url);
+            console.log('[Chat Export] Discovered detail API via fetch:', url, 'Status:', res.status);
           } else if (url.includes('/list') || url.includes('/page')) {
             discoveredEndpoints.list.add(url);
-            console.log('[Chat Export] Discovered list API via fetch:', url);
+            console.log('[Chat Export] Discovered list API via fetch:', url, 'Status:', res.status);
           }
         }
         
-        // 检查是否是我们已知的模式
-        if (YUANBAO_DETAIL_RE.test(url)) {
+        // 检查是否是我们已知的模式或已发现的端点，只处理成功的请求
+        if (((YUANBAO_DETAIL_RE.test(url) || discoveredEndpoints.detail.has(url)) && res.status === 200)) {
           console.log('[Chat Export] Intercepted fetch detail API:', url);
           res
             .clone()
             .text()
             .then((t) => handleYuanbaoResponse(t, url))
             .catch(() => {});
-        } else if (YUANBAO_LIST_RE.test(url)) {
+        } else if (((YUANBAO_LIST_RE.test(url) || discoveredEndpoints.list.has(url)) && res.status === 200)) {
           console.log('[Chat Export] Intercepted fetch list API:', url);
           res
             .clone()
@@ -1493,14 +1522,9 @@
     const candidates = Array.from(discoveredEndpoints[type]);
     if (candidates.length === 0) return null;
     
-    // 优先选择更具体的端点（包含版本号的）
-    const versionedEndpoints = candidates.filter(ep => /\/v\d+\//.test(ep));
-    if (versionedEndpoints.length > 0) {
-      return versionedEndpoints[0];
-    }
-    
-    // 否则返回第一个
-    return candidates[0];
+    // 优先选择最近被发现的成功的端点
+    // 由于Set是有序的，最后添加的会在末尾
+    return candidates[candidates.length - 1];
   }
 
   let autoFetchStarted = false;
