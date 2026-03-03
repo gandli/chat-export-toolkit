@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Chat Export Toolkit
 // @namespace    https://github.com/gandli/chat-export-toolkit
-// @version      0.5.0
+// @version      0.6.0
 // @description  Export/copy current Yuanbao conversation and export all conversations as ZIP (MD/JSON/DOCX)
 // @author       gandli
 // @match        *://yuanbao.tencent.com/*
@@ -475,23 +475,26 @@
             }
 
             if (endpoints.detail && endpoints.list) break;
-          } catch {
-            // 忽略单个 JS 文件加载失败
+          } catch (err) {
+            console.log('[Chat Export] Failed to load JS file:', scriptUrl, err?.message);
           }
         }
       }
-    } catch {
-      // 忽略发现错误，使用回退策略
+    } catch (err) {
+      console.log('[Chat Export] API discovery error:', err?.message);
     }
 
     // 6. 如果动态发现失败，使用回退端点（带版本探测）
     if (!endpoints.detail) {
+      console.log('[Chat Export] Using fallback probe for detail API');
       endpoints.detail = await probeDetailApi();
     }
     if (!endpoints.list) {
+      console.log('[Chat Export] Using fallback probe for list API');
       endpoints.list = await probeListApi();
     }
 
+    console.log('[Chat Export] Discovered API endpoints:', API_ENDPOINTS);
     API_ENDPOINTS = { ...endpoints, discovered: true };
     return API_ENDPOINTS;
   }
@@ -669,6 +672,10 @@
   }
 
   async function fetchConversationDetailById(id) {
+    // 首先尝试获取动态发现的 API 端点
+    const apiEndpoints = await discoverApiEndpoints();
+    const detailEndpoint = apiEndpoints.detail;
+
     const bodyCandidates = [
       { conversationId: id },
       { conversation_id: id },
@@ -676,13 +683,24 @@
       { chatId: id },
       { id },
     ];
-    const detailPaths = [
+
+    // 构建候选端点列表：动态发现的端点优先
+    const detailPaths = [];
+    if (detailEndpoint) {
+      const basePath = detailEndpoint.split('?')[0];
+      detailPaths.push(basePath);
+    }
+    detailPaths.push(
       '/api/user/agent/conversation/v2/detail',
       '/api/user/agent/conversation/v1/detail',
       '/api/conversation/v2/detail',
-      '/api/conversation/v1/detail',
-    ];
-    for (const path of detailPaths) {
+      '/api/conversation/v1/detail'
+    );
+
+    // 去重
+    const uniquePaths = [...new Set(detailPaths)];
+
+    for (const path of uniquePaths) {
       for (const body of bodyCandidates) {
         try {
           const json = await fetchJson(path, {
@@ -699,35 +717,36 @@
       }
     }
 
-    const getCandidates = [
-      `/api/user/agent/conversation/v2/detail?conversationId=${encodeURIComponent(id)}`,
-      `/api/user/agent/conversation/v1/detail?conversationId=${encodeURIComponent(id)}`,
-      `/api/conversation/v2/detail?conversationId=${encodeURIComponent(id)}`,
-      `/api/conversation/v1/detail?conversationId=${encodeURIComponent(id)}`,
-      `/api/user/agent/conversation/v2/detail?conversation_id=${encodeURIComponent(id)}`,
-      `/api/user/agent/conversation/v1/detail?conversation_id=${encodeURIComponent(id)}`,
-      `/api/user/agent/conversation/v2/detail?sessionId=${encodeURIComponent(id)}`,
-      `/api/user/agent/conversation/v1/detail?sessionId=${encodeURIComponent(id)}`,
-      `/api/user/agent/conversation/v2/detail?chatId=${encodeURIComponent(id)}`,
-      `/api/user/agent/conversation/v1/detail?chatId=${encodeURIComponent(id)}`,
-      `/api/user/agent/conversation/v2/detail?id=${encodeURIComponent(id)}`,
-      `/api/user/agent/conversation/v1/detail?id=${encodeURIComponent(id)}`,
-      `/api/user/agent/conversation/v2/detail/${encodeURIComponent(id)}`,
-      `/api/user/agent/conversation/v1/detail/${encodeURIComponent(id)}`,
-    ];
+    // GET 请求回退
+    const getBasePaths = [];
+    if (detailEndpoint) {
+      getBasePaths.push(detailEndpoint.split('?')[0]);
+    }
+    getBasePaths.push(
+      '/api/user/agent/conversation/v2/detail',
+      '/api/user/agent/conversation/v1/detail',
+      '/api/conversation/v2/detail',
+      '/api/conversation/v1/detail'
+    );
 
-    for (const u of getCandidates) {
-      try {
-        const json = await fetchJson(u);
-        if (Array.isArray(json?.convs)) return json;
-        if (Array.isArray(json?.data?.convs)) return json.data;
-        if (Array.isArray(json?.result?.convs)) return json.result;
-      } catch {
-        // next
+    const uniqueGetPaths = [...new Set(getBasePaths)];
+    const paramNames = ['conversationId', 'conversation_id', 'sessionId', 'chatId', 'id'];
+
+    for (const basePath of uniqueGetPaths) {
+      for (const paramName of paramNames) {
+        const u = `${basePath}?${paramName}=${encodeURIComponent(id)}`;
+        try {
+          const json = await fetchJson(u);
+          if (Array.isArray(json?.convs)) return json;
+          if (Array.isArray(json?.data?.convs)) return json.data;
+          if (Array.isArray(json?.result?.convs)) return json.result;
+        } catch {
+          // next
+        }
       }
     }
 
-    throw new Error(`无法获取会话详情: ${id}`);
+    throw new Error(`无法获取会话详情：${id}`);
   }
 
   async function ensureAllConversationsLoaded(onProgress) {
@@ -1255,12 +1274,16 @@
           try {
             const url = this.responseURL || '';
             if (YUANBAO_DETAIL_RE.test(url)) {
+              console.log('[Chat Export] Intercepted detail API:', url);
               handleYuanbaoResponse(this.responseText, url);
               return;
             }
-            if (YUANBAO_LIST_RE.test(url)) handleConversationListResponse(this.responseText);
-          } catch {
-            // ignore
+            if (YUANBAO_LIST_RE.test(url)) {
+              console.log('[Chat Export] Intercepted list API:', url);
+              handleConversationListResponse(this.responseText);
+            }
+          } catch (err) {
+            console.error('[Chat Export] XHR intercept error:', err);
           }
         },
         { once: true }
@@ -1274,20 +1297,22 @@
       try {
         const url = args[0] instanceof Request ? args[0].url : String(args[0] || '');
         if (YUANBAO_DETAIL_RE.test(url)) {
+          console.log('[Chat Export] Intercepted fetch detail API:', url);
           res
             .clone()
             .text()
             .then((t) => handleYuanbaoResponse(t, url))
             .catch(() => {});
         } else if (YUANBAO_LIST_RE.test(url)) {
+          console.log('[Chat Export] Intercepted fetch list API:', url);
           res
             .clone()
             .text()
             .then((t) => handleConversationListResponse(t))
             .catch(() => {});
         }
-      } catch {
-        // ignore
+      } catch (err) {
+        console.error('[Chat Export] Fetch intercept error:', err);
       }
       return res;
     };
