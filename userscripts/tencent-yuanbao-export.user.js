@@ -43,11 +43,22 @@
   };
 
   const SEL = {
-    title: ["header h1", "header h2", '[class*="title"]', "h1", "h2"],
+    title: [
+      'header h1',
+      'header h2',
+      '[class*="title"]',
+      '[class*="chat-title"]',
+      '[class*="conversation-title"]',
+      '.dialogue-title',
+      '.chat-header h1',
+      'h1',
+      'h2',
+    ],
     scrollContainers: [
       '[class*="message-list"]',
       '[class*="chat-content"]',
       '[class*="conversation-content"]',
+      '[class*="scroll"]',
       "main",
       "body",
     ],
@@ -57,16 +68,31 @@
       '[class*="message"]',
       '[class*="bubble"]',
       '[class*="item"]',
+      '[class*="user-message"]',
+      '[class*="assistant-message"]',
     ],
     codeBlocks: ["pre code", "pre"],
     links: ["a[href]"],
+    sidebar: [
+      "aside",
+      '[class*="sidebar"]',
+      '[class*="conversation-list"]',
+      '[class*="session-list"]',
+      '[class*="chat-list"]',
+      '[role="navigation"]',
+    ],
     sidebarItems: [
+      '[class*="conversation-item"]',
+      '[class*="session-item"]',
+      '[class*="chat-item"]',
       '[class*="conversation-list"] [class*="item"]',
       '[class*="session-list"] [class*="item"]',
       '[class*="chat-list"] [class*="item"]',
       'aside [class*="item"]',
-      "aside li",
-      "aside a",
+      'aside li',
+      'aside a',
+      '[class*="list-item"]',
+      '[role="listitem"]',
     ],
   };
 
