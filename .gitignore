@@ -72,3 +72,4 @@ logs/
 .*/skills/
 skills-lock.json
 QWEN.md
+*.txt
