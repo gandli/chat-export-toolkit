@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         腾讯元宝导出增强版（批量导出全部会话）
 // @namespace    https://github.com/gandli/chat-export-toolkit
-// @version      1.1.1
+// @version      1.1.2
 // @description  支持单会话导出 + 批量导出左侧全部会话（LLM Friendly Markdown/JSON）
 // @author       gandli
-// @match        https://yuanbao.tencent.com/*
+// @match        *://yuanbao.tencent.com/*
+// @match        *://*.yuanbao.tencent.com/*
 // @grant        GM_setClipboard
 // @license      MIT
 // ==/UserScript==
@@ -279,6 +280,29 @@
     setTimeout(() => el.style.display = 'none', 1800);
   }
 
+  function selfCheckPing() {
+    const id = 'yb-export-selfcheck';
+    if (document.getElementById(id)) return;
+    const badge = document.createElement('div');
+    badge.id = id;
+    badge.textContent = '✅ 元宝导出脚本已加载';
+    Object.assign(badge.style, {
+      position: 'fixed',
+      right: `${CFG.buttonRight}px`,
+      bottom: `${CFG.buttonBottom + 194}px`,
+      zIndex: 9999999,
+      background: '#10b981',
+      color: '#fff',
+      padding: '8px 12px',
+      borderRadius: '8px',
+      fontSize: '13px',
+      boxShadow: '0 3px 10px rgba(0,0,0,.2)'
+    });
+    document.body.appendChild(badge);
+    console.log('[Yuanbao Export] self-check OK: script loaded');
+    setTimeout(() => badge.remove(), 3000);
+  }
+
   async function autoScrollTopCurrentChat() {
     const sc = firstExisting(SEL.scrollContainers);
     for (let i = 0; i < CFG.autoScrollRounds; i++) {
@@ -450,6 +474,7 @@
   const timer = setInterval(() => {
     if (document.body) {
       clearInterval(timer);
+      selfCheckPing();
       mountUI();
       toast('导出工具已就绪（含批量导出）');
     }
