@@ -15,8 +15,16 @@
 (function () {
   'use strict';
 
-  const YUANBAO_DETAIL_RE = /\/api\/user\/agent\/conversation\/v1\/detail\b/;
-  const YUANBAO_LIST_RE = /\/api\/user\/agent\/conversation\/v1\/(?:list|page|list_page)\b/;
+  // API 端点缓存（动态发现 + 回退）
+  let API_ENDPOINTS = {
+    detail: null,
+    list: null,
+    discovered: false,
+  };
+
+  // 正则表达式用于拦截响应（支持任意版本 v\d+）
+  const YUANBAO_DETAIL_RE = /\/api\/(?:user\/agent\/)?conversation\/v\d+\/detail/;
+  const YUANBAO_LIST_RE = /\/api\/(?:user\/agent\/)?conversation\/v\d+\/(?:list|page|list_page)/;
 
   const state = {
     current: null,
@@ -399,19 +407,185 @@
     }
   }
 
+  // 动态发现 API 端点
+  async function discoverApiEndpoints() {
+    if (API_ENDPOINTS.discovered) return API_ENDPOINTS;
+
+    const endpoints = {
+      detail: null,
+      list: null,
+    };
+
+    try {
+      // 1. 从页面 JS 资源中提取 API 端点
+      const scripts = Array.from(document.querySelectorAll('script[src]'));
+      const jsUrls = scripts.map(s => s.src).filter(src => src.includes('.js'));
+
+      // 2. 同时检查内联脚本
+      const inlineScripts = Array.from(document.querySelectorAll('script:not([src])'));
+      const inlineContents = inlineScripts.map(s => s.textContent).filter(Boolean);
+
+      // 3. 从 JS 文件内容中提取 API 模式
+      const apiPatterns = [
+        /["'`]\/api\/(?:user\/agent\/)?conversation\/v\d+\/detail["'`]/g,
+        /["'`]\/api\/(?:user\/agent\/)?conversation\/v\d+\/(?:list|page|list_page)["'`]/g,
+        /["'`]\/api\/conversation\/v\d+\/detail["'`]/g,
+        /["'`]\/api\/conversation\/v\d+\/(?:list|page|list_page)["'`]/g,
+      ];
+
+      // 4. 尝试从内联脚本中提取
+      for (const content of inlineContents) {
+        for (const pattern of apiPatterns) {
+          const matches = content.match(pattern);
+          if (matches) {
+            for (const match of matches) {
+              const path = match.replace(/["'`]/g, '');
+              if (path.includes('/detail') && !endpoints.detail) {
+                endpoints.detail = path;
+              } else if (path.includes('/list') || path.includes('/page') || path.includes('/list_page')) {
+                if (!endpoints.list || path.includes('/list')) {
+                  endpoints.list = path;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // 5. 如果内联脚本没有找到，尝试从外部 JS 文件提取（采样前 5 个）
+      if (!endpoints.detail || !endpoints.list) {
+        const sampleScripts = jsUrls.slice(0, 5);
+        for (const scriptUrl of sampleScripts) {
+          try {
+            const response = await fetch(scriptUrl, { signal: AbortSignal.timeout(3000) });
+            const text = await response.text();
+
+            for (const pattern of apiPatterns) {
+              const matches = text.match(pattern);
+              if (matches) {
+                for (const match of matches) {
+                  const path = match.replace(/["'`]/g, '');
+                  if (path.includes('/detail') && !endpoints.detail) {
+                    endpoints.detail = path;
+                  } else if ((path.includes('/list') || path.includes('/page')) && !endpoints.list) {
+                    endpoints.list = path;
+                  }
+                }
+              }
+            }
+
+            if (endpoints.detail && endpoints.list) break;
+          } catch {
+            // 忽略单个 JS 文件加载失败
+          }
+        }
+      }
+    } catch {
+      // 忽略发现错误，使用回退策略
+    }
+
+    // 6. 如果动态发现失败，使用回退端点（带版本探测）
+    if (!endpoints.detail) {
+      endpoints.detail = await probeDetailApi();
+    }
+    if (!endpoints.list) {
+      endpoints.list = await probeListApi();
+    }
+
+    API_ENDPOINTS = { ...endpoints, discovered: true };
+    return API_ENDPOINTS;
+  }
+
+  // 探测 detail API 端点
+  async function probeDetailApi() {
+    const candidates = [
+      '/api/user/agent/conversation/v2/detail',
+      '/api/user/agent/conversation/v1/detail',
+      '/api/conversation/v2/detail',
+      '/api/conversation/v1/detail',
+    ];
+
+    for (const endpoint of candidates) {
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ conversationId: 'probe' }),
+          signal: AbortSignal.timeout(5000),
+        });
+        // 404 表示端点存在但参数错误，非 404 表示可能是正确端点
+        if (response.status !== 404) {
+          return endpoint;
+        }
+      } catch {
+        // 继续尝试下一个
+      }
+    }
+    return candidates[0]; // 默认回退
+  }
+
+  // 探测 list API 端点
+  async function probeListApi() {
+    const candidates = [
+      '/api/user/agent/conversation/v2/list',
+      '/api/user/agent/conversation/v2/page',
+      '/api/user/agent/conversation/v1/list',
+      '/api/user/agent/conversation/v1/page',
+      '/api/conversation/v2/list',
+      '/api/conversation/v1/list',
+    ];
+
+    for (const endpoint of candidates) {
+      try {
+        const response = await fetch(`${endpoint}?page=1&pageSize=1`, {
+          signal: AbortSignal.timeout(5000),
+        });
+        if (response.status !== 404) {
+          return endpoint;
+        }
+      } catch {
+        // 继续尝试下一个
+      }
+    }
+    return candidates[0]; // 默认回退
+  }
+
   async function fetchAllConversationMetas() {
     const all = [];
     const seen = new Set();
 
-    const baseCandidates = [
+    // 首先尝试动态发现 API 端点
+    const apiEndpoints = await discoverApiEndpoints();
+    const listEndpoint = apiEndpoints.list;
+
+    // 构建候选端点列表：动态发现的端点优先
+    const baseCandidates = [];
+    if (listEndpoint) {
+      // 从发现的路径中提取基础路径（去除查询参数）
+      const basePath = listEndpoint.split('?')[0];
+      baseCandidates.push(basePath);
+    }
+    // 添加回退端点
+    baseCandidates.push(
+      '/api/user/agent/conversation/v2/list',
+      '/api/user/agent/conversation/v2/page',
+      '/api/user/agent/conversation/v2/list_page',
       '/api/user/agent/conversation/v1/list',
       '/api/user/agent/conversation/v1/page',
       '/api/user/agent/conversation/v1/list_page',
-    ];
+      '/api/conversation/v2/list',
+      '/api/conversation/v2/page',
+      '/api/conversation/v1/list',
+      '/api/conversation/v1/page'
+    );
 
-    for (const base of baseCandidates) {
+    // 去重
+    const uniqueCandidates = [...new Set(baseCandidates)];
+
+    for (const base of uniqueCandidates) {
       let hit = false;
-      for (let page = 1; page <= 120; page += 1) {
+      // 增加分页上限到 200，但添加智能检测
+      for (let page = 1; page <= 200; page += 1) {
         const getCandidates = [
           `${base}?page=${page}&pageSize=50`,
           `${base}?pageNum=${page}&pageSize=50`,
@@ -433,9 +607,17 @@
             const json = await fetchJson(u);
             collectConversationMetasFromJson(json, all, seen);
             hit = true;
-            if (all.length > before) break;
-          } catch {
-            // next
+            // 如果此页没有新数据，可能已经到达最后一页
+            if (all.length === before) {
+              // 尝试其他参数格式
+              continue;
+            }
+            break;
+          } catch (err) {
+            // 记录第一个页面的错误用于调试
+            if (page === 1 && err?.message?.includes('404')) {
+              console.log('[Chat Export] API endpoint failed:', u, err.message);
+            }
           }
         }
 
@@ -456,10 +638,13 @@
           }
         }
 
-        if (all.length === before && page > 1) break;
+        // 智能检测：如果连续 2 页没有新数据，停止
+        if (all.length === before && page > 2) break;
+        // 第一页没有数据且没有命中，停止
         if (all.length === before && page === 1 && !hit) break;
       }
 
+      // 如果已经获取到数据，停止尝试其他端点
       if (all.length > 0) break;
     }
 
@@ -491,27 +676,43 @@
       { chatId: id },
       { id },
     ];
-    for (const body of bodyCandidates) {
-      try {
-        const json = await fetchJson('/api/user/agent/conversation/v1/detail', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        });
-        if (Array.isArray(json?.convs)) return json;
-        if (Array.isArray(json?.data?.convs)) return json.data;
-        if (Array.isArray(json?.result?.convs)) return json.result;
-      } catch {
-        // try next shape
+    const detailPaths = [
+      '/api/user/agent/conversation/v2/detail',
+      '/api/user/agent/conversation/v1/detail',
+      '/api/conversation/v2/detail',
+      '/api/conversation/v1/detail',
+    ];
+    for (const path of detailPaths) {
+      for (const body of bodyCandidates) {
+        try {
+          const json = await fetchJson(path, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+          if (Array.isArray(json?.convs)) return json;
+          if (Array.isArray(json?.data?.convs)) return json.data;
+          if (Array.isArray(json?.result?.convs)) return json.result;
+        } catch {
+          // try next shape
+        }
       }
     }
 
     const getCandidates = [
+      `/api/user/agent/conversation/v2/detail?conversationId=${encodeURIComponent(id)}`,
       `/api/user/agent/conversation/v1/detail?conversationId=${encodeURIComponent(id)}`,
+      `/api/conversation/v2/detail?conversationId=${encodeURIComponent(id)}`,
+      `/api/conversation/v1/detail?conversationId=${encodeURIComponent(id)}`,
+      `/api/user/agent/conversation/v2/detail?conversation_id=${encodeURIComponent(id)}`,
       `/api/user/agent/conversation/v1/detail?conversation_id=${encodeURIComponent(id)}`,
+      `/api/user/agent/conversation/v2/detail?sessionId=${encodeURIComponent(id)}`,
       `/api/user/agent/conversation/v1/detail?sessionId=${encodeURIComponent(id)}`,
+      `/api/user/agent/conversation/v2/detail?chatId=${encodeURIComponent(id)}`,
       `/api/user/agent/conversation/v1/detail?chatId=${encodeURIComponent(id)}`,
+      `/api/user/agent/conversation/v2/detail?id=${encodeURIComponent(id)}`,
       `/api/user/agent/conversation/v1/detail?id=${encodeURIComponent(id)}`,
+      `/api/user/agent/conversation/v2/detail/${encodeURIComponent(id)}`,
       `/api/user/agent/conversation/v1/detail/${encodeURIComponent(id)}`,
     ];
 
