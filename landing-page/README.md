@@ -123,8 +123,47 @@ git push origin gh-pages --force
 | `index.html` | 主页面 |
 | `favicon.svg` | 网站图标（SVG 格式） |
 | `robots.txt` | 搜索引擎爬虫配置 |
+| `sitemap.xml` | 网站地图（SEO） |
 | `vercel.json` | Vercel 部署配置 |
 | `README.md` | 本文件 |
+
+## 发布/更新流程
+
+### 部署到 GitHub Pages
+
+**自动部署（推荐）：**
+- 推送到 `feat/landing-page` 分支的变更会自动触发 GitHub Actions 部署
+- 部署后访问：`https://gandli.github.io/chat-export-toolkit/`
+
+**手动触发部署：**
+1. 进入 GitHub Actions → "Deploy Landing Page to GitHub Pages"
+2. 点击 "Run workflow"
+3. 等待部署完成（约 30 秒）
+
+**部署后验证清单：**
+- [ ] 页面正常加载
+- [ ] 所有链接可点击
+- [ ] 移动端响应式正常
+- [ ] 控制台无错误
+
+### 更新步骤
+
+1. 编辑 `index.html` 或其他文件
+2. 更新 Footer 中的"最后更新"日期
+3. 更新 `sitemap.xml` 中的 `<lastmod>` 日期
+4. 提交并推送到 `feat/landing-page` 分支
+5. 等待自动部署完成
+
+## 常见问题
+
+**Q: 为什么使用 CDN 版 Tailwind 而不是构建版本？**
+A: MVP 阶段追求快速迭代，CDN 版本无需构建步骤，直接编辑 HTML 即可预览。生产环境稳定后可考虑构建版本以优化性能。
+
+**Q: 如何自定义颜色主题？**
+A: 编辑 `index.html` 中的 CSS 变量 `--primary` 和 `--secondary`。
+
+**Q: GitHub Pages 部署失败怎么办？**
+A: 检查 Settings → Pages，确保 Source 设置为 "GitHub Actions" 而非传统 branch 选项。
 
 ## 待办事项
 

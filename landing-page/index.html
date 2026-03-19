@@ -136,6 +136,7 @@
         <div class="hidden md:flex space-x-8">
           <a href="#features" class="text-gray-600 hover:text-gray-900 transition">功能</a>
           <a href="#products" class="text-gray-600 hover:text-gray-900 transition">产品</a>
+          <a href="#faq" class="text-gray-600 hover:text-gray-900 transition">FAQ</a>
           <a href="#trust" class="text-gray-600 hover:text-gray-900 transition">信任</a>
           <a href="https://github.com/gandli/chat-export-toolkit" target="_blank" rel="noopener" class="text-gray-600 hover:text-gray-900 transition">GitHub</a>
         </div>
@@ -559,6 +560,85 @@
     </div>
   </section>
 
+  <!-- FAQ Section -->
+  <section id="faq" class="py-20 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">常见问题</h2>
+        <p class="text-lg text-gray-600">
+          快速解答使用中的常见疑问
+        </p>
+      </div>
+      
+      <div class="space-y-6">
+        <!-- FAQ 1 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            ❓ 这个工具安全吗？会窃取我的对话数据吗？
+          </h3>
+          <p class="text-gray-600">
+            完全安全。所有代码开源可审查，数据处理完全在浏览器本地进行，不会上传任何内容到外部服务器。你可以查看源代码确认这一点。
+          </p>
+        </div>
+        
+        <!-- FAQ 2 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            ❓ 需要注册或付费吗？
+          </h3>
+          <p class="text-gray-600">
+            不需要。这是一个完全免费、开源的工具，无需注册、无需付费、无隐藏费用。
+          </p>
+        </div>
+        
+        <!-- FAQ 3 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            ❓ 支持哪些浏览器？
+          </h3>
+          <p class="text-gray-600">
+            Tampermonkey 脚本版本支持所有主流浏览器（Chrome、Edge、Firefox、Safari 等），只要能够安装 Tampermonkey 扩展即可使用。
+          </p>
+        </div>
+        
+        <!-- FAQ 4 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            ❓ 如何安装 Tampermonkey 脚本？
+          </h3>
+          <p class="text-gray-600">
+            1. 先在浏览器安装 <a href="https://www.tampermonkey.net/" target="_blank" rel="noopener" class="text-emerald-600 hover:underline">Tampermonkey 扩展</a><br>
+            2. 克隆或下载本仓库<br>
+            3. 按照 <a href="https://github.com/gandli/chat-export-toolkit#安装与构建" target="_blank" rel="noopener" class="text-emerald-600 hover:underline">安装说明</a> 构建并加载脚本<br>
+            4. 访问腾讯元宝等支持的 AI 平台页面，脚本会自动注入
+          </p>
+        </div>
+        
+        <!-- FAQ 5 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            ❓ 导出的数据格式有什么区别？
+          </h3>
+          <p class="text-gray-600">
+            <strong>Markdown</strong>：适合阅读、笔记软件导入（如 Obsidian、Notion）<br>
+            <strong>JSON</strong>：结构化数据，适合程序处理、二次开发<br>
+            <strong>DOCX</strong>：Word 文档格式，适合正式归档、打印
+          </p>
+        </div>
+        
+        <!-- FAQ 6 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            ❓ 如何反馈问题或请求新功能？
+          </h3>
+          <p class="text-gray-600">
+            欢迎在 <a href="https://github.com/gandli/chat-export-toolkit/issues" target="_blank" rel="noopener" class="text-emerald-600 hover:underline">GitHub Issues</a> 提交问题反馈或功能请求。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- CTA Section -->
   <section class="py-20 bg-white">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -594,6 +674,7 @@
           <p class="text-gray-900 font-semibold text-lg">Chat Export Toolkit</p>
           <p class="text-sm text-gray-500 mt-2">多站点 AI 对话导出工具包</p>
           <p class="text-xs text-gray-400 mt-1">版本 v0.7.0-alpha.1 · MIT License</p>
+          <p class="text-xs text-gray-400 mt-1">最后更新：2026-03-19</p>
         </div>
         <div class="text-center">
           <p class="text-gray-900 font-semibold mb-3">快速链接</p>

@@ -4,5 +4,5 @@
 User-agent: *
 Allow: /
 
-# Sitemap (when available)
-# Sitemap: https://your-domain.com/sitemap.xml
+# Sitemap
+Sitemap: https://gandli.github.io/chat-export-toolkit/sitemap.xml
