@@ -73,21 +73,30 @@ python -m SimpleHTTPServer 8000
 
 ## 部署
 
-### GitHub Pages
+### GitHub Pages（推荐 - 自动部署）
 
+本项目已配置 GitHub Actions 自动部署工作流。
+
+**自动部署：**
+- 推送到 `feat/landing-page` 分支的 `landing-page/` 目录变更会自动触发部署
+- 也可手动触发：GitHub Actions → "Deploy Landing Page to GitHub Pages" → Run workflow
+
+**首次设置步骤：**
+1. 进入仓库 Settings → Pages
+2. 在 "Source" 下选择 "GitHub Actions"（而非传统的 branch 选项）
+3. 等待首次工作流运行完成
+4. 部署后页面地址：`https://gandli.github.io/chat-export-toolkit/`
+
+**手动部署（可选）：**
 ```bash
-# 方式 1: 使用 gh-pages 分支
+# 使用 gh-pages 分支（传统方式）
 git checkout --orphan gh-pages
 git reset --hard
 cp landing-page/* .
 git add .
 git commit -m "Deploy landing page to GitHub Pages"
 git push origin gh-pages --force
-
-# 方式 2: 保持 landing-page 目录，使用 GitHub Actions 部署
 ```
-
-然后在仓库设置中启用 GitHub Pages，选择 `gh-pages` 分支。
 
 ### Vercel
 
