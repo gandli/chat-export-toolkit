@@ -1,6 +1,6 @@
 # Landing Page
 
-Chat Export Toolkit 项目落地页（MVP）。
+Chat Export Toolkit 项目落地页。
 
 ## 快速开始
 
@@ -47,9 +47,9 @@ python -m SimpleHTTPServer 8000
 
 ## 页面结构
 
-- **Hero** - 主标题、副标题、CTA 按钮
+- **Hero** - 主标题、副标题、CTA 按钮、版本标识
 - **功能亮点** - 6 个核心功能卡片
-- **产品形态** - Tampermonkey 脚本 vs 浏览器扩展对比
+- **产品形态** - Tampermonkey 脚本（当前主力）与浏览器扩展（开发中）
 - **支持平台** - 各平台支持状态表格
 - **信任区块** - 为什么值得信任（开源、本地处理、透明）
 - **CTA** - 开始使用引导
@@ -71,26 +71,59 @@ python -m SimpleHTTPServer 8000
 ### 修改内容
 直接编辑 `index.html` 中的文本内容。
 
-### 部署
+## 部署
 
-#### GitHub Pages
-1. 将 `landing-page/` 目录内容推送到 `gh-pages` 分支
-2. 在仓库设置中启用 GitHub Pages
+### GitHub Pages
 
-#### Vercel / Netlify
-将整个仓库或 `landing-page/` 目录拖放到 Vercel/Netlify 即可自动部署。
+```bash
+# 方式 1: 使用 gh-pages 分支
+git checkout --orphan gh-pages
+git reset --hard
+cp landing-page/* .
+git add .
+git commit -m "Deploy landing page to GitHub Pages"
+git push origin gh-pages --force
 
-#### 自定义域名
+# 方式 2: 保持 landing-page 目录，使用 GitHub Actions 部署
+```
+
+然后在仓库设置中启用 GitHub Pages，选择 `gh-pages` 分支。
+
+### Vercel
+
+1. 登录 [Vercel](https://vercel.com)
+2. 导入 GitHub 仓库
+3. 设置 Root Directory 为 `landing-page`
+4. 点击 Deploy
+
+或使用配置文件 `vercel.json`（已提供）。
+
+### Netlify
+
+1. 登录 [Netlify](https://netlify.com)
+2. 拖放 `landing-page/` 目录到 Netlify Drop
+3. 或连接 GitHub 仓库并设置发布目录为 `landing-page`
+
+### 自定义域名
 部署后在平台设置中配置自定义域名。
+
+## 文件说明
+
+| 文件 | 说明 |
+|------|------|
+| `index.html` | 主页面 |
+| `favicon.svg` | 网站图标（SVG 格式） |
+| `robots.txt` | 搜索引擎爬虫配置 |
+| `vercel.json` | Vercel 部署配置 |
+| `README.md` | 本文件 |
 
 ## 待办事项
 
-- [ ] 添加 favicon
 - [ ] 添加项目截图/演示 GIF
-- [ ] 添加 Google Analytics（可选）
-- [ ] 添加多语言支持（如需）
+- [ ] 添加 Google Analytics（可选，需注意隐私）
 - [ ] 优化 Lighthouse 分数
 - [ ] 添加 PWA 支持（可选）
+- [ ] 添加更多平台实际验证后的状态更新
 
 ## 许可证
 
