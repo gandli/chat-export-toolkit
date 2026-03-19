@@ -1,0 +1,88 @@
+{
+  "_comment": "Yuanbao Edge Case - 标准化后的输出",
+  "_source": "fixtures/yuanbao/raw/edge-case-001.json",
+  "_normalizer": "src/normalizers/yuanbao.ts",
+
+  "id": "yuanbao_edge_001",
+  "title": "Edge Case Test",
+  "messages": [
+    {
+      "id": "yuanbao_edge_001_msg_0",
+      "role": "user",
+      "content": {
+        "text": "_No content_",
+        "attachments": []
+      },
+      "timestamp": 1710850000000,
+      "metadata": {
+        "platform": "yuanbao",
+        "originalIndex": 0,
+        "originalSpeaker": "user",
+        "turnIndex": 0,
+        "blockCount": 0
+      }
+    },
+    {
+      "id": "yuanbao_edge_001_msg_1",
+      "role": "assistant",
+      "content": {
+        "text": "> [Think]\n> 用户发送了空消息，我需要礼貌地回应。\n\n您好！看起来您发送了一条空消息。有什么我可以帮助您的吗？",
+        "attachments": []
+      },
+      "timestamp": 1710850005000,
+      "metadata": {
+        "platform": "yuanbao",
+        "originalIndex": 1,
+        "originalSpeaker": "ai",
+        "turnIndex": 1,
+        "blockCount": 2
+      }
+    },
+    {
+      "id": "yuanbao_edge_001_msg_2",
+      "role": "user",
+      "content": {
+        "text": "测试特殊字符：@#$%^&*() 和 emoji 🎉🚀",
+        "attachments": []
+      },
+      "timestamp": 1710850010000,
+      "metadata": {
+        "platform": "yuanbao",
+        "originalIndex": 2,
+        "originalSpeaker": "user",
+        "turnIndex": 2,
+        "blockCount": 1
+      }
+    },
+    {
+      "id": "yuanbao_edge_001_msg_3",
+      "role": "assistant",
+      "content": {
+        "text": "收到！特殊字符和 emoji 都能正常显示：@#$%^&*() 🎉🚀",
+        "attachments": []
+      },
+      "timestamp": 1710850015000,
+      "metadata": {
+        "platform": "yuanbao",
+        "originalIndex": 3,
+        "originalSpeaker": "ai",
+        "turnIndex": 3,
+        "blockCount": 1
+      }
+    }
+  ],
+  "createdAt": 1710850000000,
+  "updatedAt": 1710850015000,
+  "metadata": {
+    "platform": "yuanbao",
+    "participantCount": 2,
+    "messageCount": 4,
+    "originalData": {
+      "conversationId": "yuanbao_edge_001",
+      "sessionTitle": "Edge Case Test",
+      "title": "边界测试",
+      "createTime": 1710850000000,
+      "updateTime": 1710850015000
+    }
+  }
+}

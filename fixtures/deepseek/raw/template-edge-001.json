@@ -1,0 +1,76 @@
+{
+  "_comment": "DeepSeek 边界情况模板 - 用于测试边界情况处理",
+  "_status": "TEMPLATE",
+  "_instructions": "此文件定义边界情况的预期结构。真实样本采集后请复制并替换。",
+  
+  "platform": "deepseek",
+  "data": {
+    "id": "deepseek-edge-template-001",
+    "conversation_id": "deepseek-edge-template-001",
+    "title": "DeepSeek 边界情况测试",
+    "created_at": 1710840000000,
+    "updated_at": 1710840020000,
+    
+    "messages": [
+      {
+        "id": "msg-edge-001",
+        "role": "user",
+        "content": "",
+        "created_at": 1710840000000,
+        "metadata": {
+          "note": "空消息内容测试"
+        }
+      },
+      {
+        "id": "msg-edge-002",
+        "role": "assistant",
+        "content": "这是一条包含特殊字符和 emoji 的消息：🎉🚀 @#$%^&*() 你好世界",
+        "created_at": 1710840005000,
+        "metadata": {
+          "note": "特殊字符和 emoji 测试"
+        }
+      },
+      {
+        "id": "msg-edge-003",
+        "role": "user",
+        "content": "测试数学公式：$E = mc^2$ 和块级公式 $$\\int_0^\\infty e^{-x^2} dx$$",
+        "created_at": 1710840010000,
+        "metadata": {
+          "note": "LaTeX 数学公式测试"
+        }
+      },
+      {
+        "id": "msg-edge-004",
+        "role": "assistant",
+        "content": null,
+        "created_at": 1710840015000,
+        "metadata": {
+          "note": "null 内容测试"
+        }
+      },
+      {
+        "id": "msg-edge-005",
+        "role": "assistant",
+        "content": "超长消息测试：这是一段非常长的文本，用于测试长消息的处理。这是一段非常长的文本，用于测试长消息的处理。这是一段非常长的文本，用于测试长消息的处理。这是一段非常长的文本，用于测试长消息的处理。这是一段非常长的文本，用于测试长消息的处理。这是一段非常长的文本，用于测试长消息的处理。这是一段非常长的文本，用于测试长消息的处理。这是一段非常长的文本，用于测试长消息的处理。这是一段非常长的文本，用于测试长消息的处理。这是一段非常长的文本，用于测试长消息的处理。",
+        "created_at": 1710840020000,
+        "reasoning_content": "这是一个超长的推理过程，用于测试长推理内容的处理。这是一个超长的推理过程，用于测试长推理内容的处理。这是一个超长的推理过程，用于测试长推理内容的处理。这是一个超长的推理过程，用于测试长推理内容的处理。这是一个超长的推理过程，用于测试长推理内容的处理。",
+        "metadata": {
+          "note": "超长内容测试"
+        }
+      }
+    ],
+    
+    "metadata": {
+      "message_count": 5,
+      "source": "template",
+      "edge_cases": [
+        "empty_content",
+        "special_characters",
+        "emoji",
+        "latex_formulas",
+        "null_content",
+        "long_content"
+      ]
+    }
+  }
+}

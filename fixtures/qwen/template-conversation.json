@@ -1,0 +1,70 @@
+{
+  "_comment": "Qwen 平台标准化对话模板 - 用于测试开发，待替换为真实样本",
+  "_status": "TEMPLATE",
+  "_instructions": "此文件为 fixture 模板，遵循统一的 Conversation schema。采集真实 Qwen 样本后请复制此文件并替换为真实数据。",
+  "id": "qwen-example-001",
+  "title": "Qwen 示例对话",
+  "messages": [
+    {
+      "id": "qwen-msg-001",
+      "role": "user",
+      "content": {
+        "text": "你好，请介绍一下你自己。",
+        "attachments": []
+      },
+      "timestamp": 1710840000000,
+      "metadata": {
+        "platform": "qwen",
+        "originalId": "qwen-original-msg-001"
+      }
+    },
+    {
+      "id": "qwen-msg-002",
+      "role": "assistant",
+      "content": {
+        "text": "你好！我是通义千问（Qwen），是阿里巴巴集团旗下的超大规模语言模型。我可以帮助你回答问题、创作文字、进行逻辑推理、编程等。有什么我可以帮助你的吗？",
+        "attachments": []
+      },
+      "timestamp": 1710840005000,
+      "metadata": {
+        "platform": "qwen",
+        "originalId": "qwen-original-msg-002"
+      }
+    },
+    {
+      "id": "qwen-msg-003",
+      "role": "user",
+      "content": {
+        "text": "能帮我写一个 Python 函数来计算斐波那契数列吗？",
+        "attachments": []
+      },
+      "timestamp": 1710840010000,
+      "metadata": {
+        "platform": "qwen",
+        "originalId": "qwen-original-msg-003"
+      }
+    },
+    {
+      "id": "qwen-msg-004",
+      "role": "assistant",
+      "content": {
+        "text": "<think>\n用户需要一个计算斐波那契数列的 Python 函数。\n斐波那契数列定义：F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2)\n我可以提供几种实现方式：\n1. 递归实现（简单但效率低）\n2. 迭代实现（效率高）\n3. 带缓存的递归（平衡方案）\n我应该提供多种方案供用户选择。\n</think>\n当然可以！以下是几种计算斐波那契数列的 Python 实现方式：\n\n## 方法 1：迭代实现（推荐）\n\n```python\ndef fibonacci(n):\n    \"\"\"计算第 n 个斐波那契数（迭代方式）\"\"\"\n    if n <= 0:\n        return 0\n    elif n == 1:\n        return 1\n    \n    a, b = 0, 1\n    for _ in range(2, n + 1):\n        a, b = b, a + b\n    return b\n\n# 测试\nfor i in range(10):\n    print(f\"F({i}) = {fibonacci(i)}\")\n```\n\n## 方法 2：递归实现（简洁但效率低）\n\n```python\ndef fibonacci_recursive(n):\n    \"\"\"计算第 n 个斐波那契数（递归方式）\"\"\"\n    if n <= 0:\n        return 0\n    elif n == 1:\n        return 1\n    return fibonacci_recursive(n - 1) + fibonacci_recursive(n - 2)\n```\n\n## 方法 3：带缓存的递归\n\n```python\nfrom functools import lru_cache\n\n@lru_cache(maxsize=None)\ndef fibonacci_cached(n):\n    \"\"\"计算第 n 个斐波那契数（带缓存）\"\"\"\n    if n <= 0:\n        return 0\n    elif n == 1:\n        return 1\n    return fibonacci_cached(n - 1) + fibonacci_cached(n - 2)\n```\n\n**推荐使用方法 1（迭代）**，因为它：\n- 时间复杂度 O(n)\n- 空间复杂度 O(1)\n- 没有栈溢出风险\n\n需要我解释具体实现细节吗？",
+        "attachments": []
+      },
+      "timestamp": 1710840015000,
+      "metadata": {
+        "platform": "qwen",
+        "originalId": "qwen-original-msg-004"
+      }
+    }
+  ],
+  "createdAt": 1710840000000,
+  "updatedAt": 1710840015000,
+  "metadata": {
+    "platform": "qwen",
+    "participantCount": 2,
+    "messageCount": 4,
+    "source": "template",
+    "采集说明": "此文件为模板，真实样本需要从 https://tongyi.aliyun.com/qianwen 采集 API 响应"
+  }
+}

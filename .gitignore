@@ -32,6 +32,12 @@ output/
 # Node.js dependencies
 node_modules/
 
+# Bun
+bun.lockb
+
+# TypeScript
+*.tsbuildinfo
+
 # npm/yarn logs
 npm-debug.log*
 yarn-debug.log*

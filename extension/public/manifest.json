@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "Chat Export Toolkit",
+  "description": "Export AI chat conversations from supported websites.",
+  "version": "0.1.0",
+  "action": {
+    "default_title": "Chat Export Toolkit",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": [
+    "activeTab",
+    "downloads",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://chat.openai.com/*",
+    "https://chatgpt.com/*",
+    "https://claude.ai/*",
+    "https://kimi.moonshot.cn/*",
+    "https://yuanbao.tencent.com/*",
+    "https://*.yuanbao.tencent.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chat.openai.com/*",
+        "https://chatgpt.com/*",
+        "https://claude.ai/*",
+        "https://kimi.moonshot.cn/*",
+        "https://yuanbao.tencent.com/*",
+        "https://*.yuanbao.tencent.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

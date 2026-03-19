@@ -1,0 +1,14 @@
+# 示例 cURL 命令 - 请替换为真实采集的命令
+# 使用方法：bash list-request.curl
+# 注意：提交前请移除 Cookie 和 Authorization 等敏感信息
+
+curl 'https://yuanbao.tencent.com/api/user/agent/conversation/v2/list?page=1&pageSize=20' \
+  -H 'Content-Type: application/json' \
+  -H 'Cookie: [REDACTED - 请替换或移除]' \
+  -H 'Authorization: [REDACTED - 请替换或移除]'
+
+# 注意：
+# 1. 这是示例命令，不会实际工作
+# 2. 请从浏览器开发者工具复制真实的 cURL 命令
+# 3. 提交前务必脱敏 Cookie 和 Authorization 字段
+# 4. 运行 bun run scripts/capture-yuanbao-samples.ts 获取采集说明

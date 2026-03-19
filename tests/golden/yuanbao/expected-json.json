@@ -1,0 +1,82 @@
+{
+  "_comment": "Yuanbao Golden Test - JSON Export 预期输出",
+  "_source": "fixtures/yuanbao/normalized/normalized-001.json",
+  "_exporter": "src/exporters/json.ts",
+  "_description": "JSON 格式导出的基准输出",
+
+  "id": "yuanbao_golden_001",
+  "title": "Golden Test - TypeScript 代码示例",
+  "messages": [
+    {
+      "id": "yuanbao_golden_001_msg_0",
+      "role": "user",
+      "content": {
+        "text": "你好，请介绍一下你自己。",
+        "attachments": []
+      },
+      "timestamp": 1710840000000,
+      "metadata": {
+        "platform": "yuanbao",
+        "originalIndex": 0,
+        "originalSpeaker": "user",
+        "turnIndex": 0,
+        "blockCount": 1
+      }
+    },
+    {
+      "id": "yuanbao_golden_001_msg_1",
+      "role": "assistant",
+      "content": {
+        "text": "> [Think] 思考过程\n> 用户想了解我的基本信息。我需要简洁地介绍自己的功能和定位。\n\n你好！我是腾讯元宝，由腾讯公司开发的 AI 助手。我可以帮助你：\n\n1. 回答各种问题\n2. 协助写作和编辑\n3. 提供建议和方案\n4. 进行对话交流\n\n有什么我可以帮助你的吗？",
+        "attachments": []
+      },
+      "timestamp": 1710840005000,
+      "metadata": {
+        "platform": "yuanbao",
+        "originalIndex": 1,
+        "originalSpeaker": "ai",
+        "turnIndex": 1,
+        "blockCount": 2
+      }
+    },
+    {
+      "id": "yuanbao_golden_001_msg_2",
+      "role": "user",
+      "content": {
+        "text": "能帮我写一段 TypeScript 代码吗？",
+        "attachments": []
+      },
+      "timestamp": 1710840010000,
+      "metadata": {
+        "platform": "yuanbao",
+        "originalIndex": 2,
+        "originalSpeaker": "user",
+        "turnIndex": 2,
+        "blockCount": 1
+      }
+    },
+    {
+      "id": "yuanbao_golden_001_msg_3",
+      "role": "assistant",
+      "content": {
+        "text": "> [Think]\n> 用户需要 TypeScript 代码示例。我应该提供一个实用的例子，比如一个工具函数。\n\n当然可以！下面是一个 TypeScript 工具函数示例：\n\n```typescript\nfunction formatDate(date: Date): string {\n  const year = date.getFullYear();\n  const month = String(date.getMonth() + 1).padStart(2, '0');\n  const day = String(date.getDate()).padStart(2, '0');\n  return `${year}-${month}-${day}`;\n}\n```\n\n这个函数将 Date 对象格式化为 YYYY-MM-DD 格式的字符串。",
+        "attachments": []
+      },
+      "timestamp": 1710840015000,
+      "metadata": {
+        "platform": "yuanbao",
+        "originalIndex": 3,
+        "originalSpeaker": "ai",
+        "turnIndex": 3,
+        "blockCount": 2
+      }
+    }
+  ],
+  "createdAt": 1710840000000,
+  "updatedAt": 1710840015000,
+  "metadata": {
+    "platform": "yuanbao",
+    "participantCount": 2,
+    "messageCount": 4
+  }
+}

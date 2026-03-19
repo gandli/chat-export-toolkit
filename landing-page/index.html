@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Chat Export Toolkit — 多站点 AI 对话导出工具包。支持腾讯元宝、ChatGPT、Claude、Kimi 等平台，一键导出对话为 Markdown/JSON/DOCX 格式。">
+  <meta name="keywords" content="AI 对话导出，ChatGPT 导出，元宝导出，Kimi 导出，Claude 导出，聊天记录备份">
+  <meta name="author" content="gandli">
+  <meta name="theme-color" content="#01B259">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Chat Export Toolkit - AI 对话导出工具包">
+  <meta property="og:description" content="多站点 AI 对话导出工具包，支持一键导出对话为 Markdown/JSON/DOCX 格式">
+  <meta property="og:url" content="https://github.com/gandli/chat-export-toolkit">
+  <meta property="og:image" content="https://opengraph.githubassets.com/1/chat-export-toolkit/gandli/chat-export-toolkit">
+  <meta property="og:site_name" content="Chat Export Toolkit">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Chat Export Toolkit - AI 对话导出工具包">
+  <meta name="twitter:description" content="多站点 AI 对话导出工具包，支持一键导出对话为 Markdown/JSON/DOCX 格式">
+  <meta name="twitter:image" content="https://opengraph.githubassets.com/1/chat-export-toolkit/gandli/chat-export-toolkit">
+  
+  <title>Chat Export Toolkit - AI 对话导出工具包</title>
+  
+  <!-- Performance: Preconnect to CDN -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+  
+  <!-- Tailwind CSS (CDN for MVP) -->
+  <script src="https://cdn.tailwindcss.com" defer></script>
+  
+  <!-- Custom Styles -->
+  <style>
+    :root {
+      --primary: #01B259;
+      --primary-dark: #01964a;
+      --secondary: #0ea5e9;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, #01B259 0%, #0ea5e9 100%);
+    }
+    
+    .feature-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Button hover effects */
+    .btn-primary {
+      transition: all 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-secondary {
+      transition: all 0.2s ease;
+    }
+    
+    .btn-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.35);
+    }
+    
+    /* Mockup placeholder styles */
+    .mockup-placeholder {
+      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+      border: 2px dashed #9ca3af;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .mockup-placeholder::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+      animation: shimmer 3s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) rotate(45deg); }
+    }
+    
+    .mockup-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    /* Anchor offset for sticky nav */
+    section[id] {
+      scroll-margin-top: 4rem;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+  
+  <!-- Navigation -->
+  <nav class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center">
+          <span class="text-xl font-bold text-gray-900">Chat Export Toolkit</span>
+        </div>
+        <div class="hidden md:flex space-x-8">
+          <a href="#features" class="text-gray-600 hover:text-gray-900 transition">功能</a>
+          <a href="#products" class="text-gray-600 hover:text-gray-900 transition">产品</a>
+          <a href="#faq" class="text-gray-600 hover:text-gray-900 transition">FAQ</a>
+          <a href="#trust" class="text-gray-600 hover:text-gray-900 transition">信任</a>
+          <a href="https://github.com/gandli/chat-export-toolkit" target="_blank" rel="noopener" class="text-gray-600 hover:text-gray-900 transition">GitHub</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="gradient-bg text-white py-20 lg:py-28">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="inline-flex items-center bg-white/10 backdrop-blur px-4 py-2 rounded-full text-sm mb-6">
+        <span class="w-2 h-2 bg-emerald-300 rounded-full mr-2 animate-pulse"></span>
+        v0.7.0-alpha · 开源免费
+      </div>
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+        一键导出你的<br class="md:hidden">AI 对话记录
+      </h1>
+      <p class="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+        支持腾讯元宝、ChatGPT、Claude、Kimi 等主流 AI 平台，<br class="hidden md:block">
+        将珍贵对话永久保存为 Markdown、JSON 或 DOCX 格式
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <a href="https://github.com/gandli/chat-export-toolkit" 
+           target="_blank" 
+           rel="noopener"
+           class="btn-primary bg-white text-emerald-600 px-8 py-3 rounded-lg font-semibold shadow-lg inline-flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-2.028 1.029-2.716-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.688 1.028 1.623 1.028 2.716 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+          </svg>
+          查看源码 & 安装
+        </a>
+        <a href="#features" class="btn-secondary bg-white/20 backdrop-blur text-white px-8 py-3 rounded-lg font-semibold">
+          了解功能
+        </a>
+      </div>
+      <p class="mt-6 text-sm text-white/80">
+        🔒 本地处理 · 无需注册 · 隐私优先
+      </p>
+    </div>
+  </section>
+
+  <!-- Demo / Mockup Section -->
+  <section class="py-20 bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">界面预览</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          简洁直观的界面设计，无缝融入 AI 平台原生体验
+        </p>
+      </div>
+      
+      <div class="max-w-4xl mx-auto">
+        <!-- Mockup Placeholder - 明确标注为占位图 -->
+        <div class="mockup-placeholder">
+          <div class="mockup-content">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <p class="text-gray-500 font-medium text-lg mb-2">界面截图占位区</p>
+            <p class="text-gray-400 text-sm max-w-md">
+              此处将展示实际工具在 AI 平台页面中的运行效果截图<br>
+              <span class="text-xs text-gray-400 mt-2 inline-block bg-gray-200 px-2 py-1 rounded">Mockup Placeholder - 待补充真实截图</span>
+            </p>
+          </div>
+        </div>
+        
+        <!-- Feature highlights below mockup -->
+        <div class="grid md:grid-cols-3 gap-6 mt-8">
+          <div class="text-center">
+            <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <p class="text-sm text-gray-600">页面内嵌 UI</p>
+          </div>
+          <div class="text-center">
+            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <p class="text-sm text-gray-600">一键导出</p>
+          </div>
+          <div class="text-center">
+            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <p class="text-sm text-gray-600">多格式支持</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">核心功能</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          为 AI 用户打造的轻量级导出工具，简单却强大
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div class="feature-card bg-gray-50 rounded-xl p-6">
+          <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">多格式导出</h3>
+          <p class="text-gray-600">支持 Markdown、JSON、DOCX 三种格式，满足笔记、归档、分享等不同场景需求</p>
+        </div>
+        
+        <!-- Feature 2 -->
+        <div class="feature-card bg-gray-50 rounded-xl p-6">
+          <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">零配置使用</h3>
+          <p class="text-gray-600">安装即用，自动检测 AI 平台页面，无需手动复制粘贴或配置 API 密钥</p>
+        </div>
+        
+        <!-- Feature 3 -->
+        <div class="feature-card bg-gray-50 rounded-xl p-6">
+          <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">可扩展架构</h3>
+          <p class="text-gray-600">基于适配器模式设计，轻松扩展支持新的 AI 平台，社区驱动持续更新</p>
+        </div>
+        
+        <!-- Feature 4 -->
+        <div class="feature-card bg-gray-50 rounded-xl p-6">
+          <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">隐私优先</h3>
+          <p class="text-gray-600">所有数据在浏览器本地处理，不上传任何内容到外部服务器，你的对话你做主</p>
+        </div>
+        
+        <!-- Feature 5 -->
+        <div class="feature-card bg-gray-50 rounded-xl p-6">
+          <div class="w-12 h-12 bg-rose-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">批量导出</h3>
+          <p class="text-gray-600">支持一键导出全部历史对话，自动打包为 ZIP 文件，方便备份和迁移</p>
+        </div>
+        
+        <!-- Feature 6 -->
+        <div class="feature-card bg-gray-50 rounded-xl p-6">
+          <div class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">开源透明</h3>
+          <p class="text-gray-600">完全开源代码，MIT 许可，可审查、可 fork、可贡献，社区共同维护</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products Section -->
+  <section id="products" class="py-20 bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">产品形态</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          当前以 Tampermonkey 脚本为主，浏览器扩展开发中
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Tampermonkey Script -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-emerald-200">
+          <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-8 text-white">
+            <div class="flex items-center justify-between mb-4">
+              <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-5.394 0l-2.384.477a2 2 0 00-1.022.547M3 19.428a2 2 0 001.022.547l2.384.477a6 6 0 005.394 0l2.384-.477a2 2 0 001.022-.547M3 5a2 2 0 012-2h14a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2V5z"/>
+              </svg>
+              <div class="flex items-center"><h3 class="text-2xl font-bold">Tampermonkey 脚本</h3></div><span class="bg-white/20 backdrop-blur px-3 py-1 rounded-full text-sm font-medium">当前主力</span>
+            </div>
+            <p class="text-emerald-100">轻量级 · 即装即用 · 跨平台</p>
+          </div>
+          <div class="p-6">
+            <ul class="space-y-3 mb-6">
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-emerald-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span class="text-gray-700">需要 Tampermonkey 浏览器扩展</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-emerald-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span class="text-gray-700">自动注入到 AI 平台页面</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-emerald-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span class="text-gray-700">页面内嵌 UI，操作直观</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-emerald-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span class="text-gray-700">支持所有主流浏览器</span>
+              </li>
+            </ul>
+            <div class="pt-6 border-t border-gray-200">
+              <a href="https://github.com/gandli/chat-export-toolkit#安装与构建" 
+                 target="_blank" 
+                 rel="noopener"
+                 class="block text-center bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-6 py-3 rounded-lg font-semibold transition">
+                查看安装说明
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Browser Extension -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 opacity-90">
+          <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-8 text-white">
+            <div class="flex items-center justify-between mb-4">
+              <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16a2 2 0 110-4 2 2 0 010 4zM3 7V5a2 2 0 012-2h2a2 2 0 012 2v2m10 0V5a2 2 0 00-2-2h-2a2 2 0 00-2 2v2m0 0V3a2 2 0 012-2h2a2 2 0 012 2v2m-4 4h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2v-2"/>
+              </svg>
+              <div class="flex items-center"><h3 class="text-2xl font-bold">浏览器扩展</h3></div><span class="bg-white/20 backdrop-blur px-3 py-1 rounded-full text-sm font-medium">开发中</span>
+            </div>
+            <p class="text-blue-100">独立扩展 · 更完整体验</p>
+          </div>
+          <div class="p-6">
+            <ul class="space-y-3 mb-6">
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span class="text-gray-700">Chrome / Edge 浏览器支持</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span class="text-gray-700">独立弹出界面，更丰富的交互</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span class="text-gray-700">可保存导出偏好设置</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span class="text-gray-700">无需额外安装 Tampermonkey</span>
+              </li>
+            </ul>
+            <div class="pt-6 border-t border-gray-200">
+              <div class="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-4">
+                <p class="text-sm text-amber-800">
+                  <strong>状态：</strong>开发中（MVP 阶段）<br>
+                  当前优先实现 ChatGPT 平台支持
+                </p>
+              </div>
+              <a href="https://github.com/gandli/chat-export-toolkit" 
+                 target="_blank" 
+                 rel="noopener"
+                 class="block text-center bg-blue-50 text-blue-700 hover:bg-blue-100 px-6 py-3 rounded-lg font-semibold transition">
+                关注开发进展
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Platform Support -->
+  <section class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">支持的平台</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          当前以腾讯元宝为主，其他平台逐步扩展中
+        </p>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full max-w-4xl mx-auto">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-left py-4 px-4 font-semibold text-gray-900">平台</th>
+              <th class="text-left py-4 px-4 font-semibold text-gray-900">状态</th>
+              <th class="text-left py-4 px-4 font-semibold text-gray-900">说明</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr>
+              <td class="py-4 px-4 text-gray-900 font-medium">腾讯元宝</td>
+              <td class="py-4 px-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800">
+                  ✅ 完整支持
+                </span>
+              </td>
+              <td class="py-4 px-4 text-gray-600">适配器、标准化器、导出器全部实现，可在实际页面使用</td>
+            </tr>
+            <tr>
+              <td class="py-4 px-4 text-gray-900 font-medium">ChatGPT</td>
+              <td class="py-4 px-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800">
+                  🚧 开发中
+                </span>
+              </td>
+              <td class="py-4 px-4 text-gray-600">核心代码已实现，待实际页面验证</td>
+            </tr>
+            <tr>
+              <td class="py-4 px-4 text-gray-900 font-medium">Kimi</td>
+              <td class="py-4 px-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
+                  📋 规划中
+                </span>
+              </td>
+              <td class="py-4 px-4 text-gray-600">已列入路线图，等待实现</td>
+            </tr>
+            <tr>
+              <td class="py-4 px-4 text-gray-900 font-medium">豆包</td>
+              <td class="py-4 px-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
+                  📋 规划中
+                </span>
+              </td>
+              <td class="py-4 px-4 text-gray-600">已列入路线图，等待实现</td>
+            </tr>
+            <tr>
+              <td class="py-4 px-4 text-gray-900 font-medium">Claude</td>
+              <td class="py-4 px-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
+                  📋 规划中
+                </span>
+              </td>
+              <td class="py-4 px-4 text-gray-600">已列入路线图，等待实现</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="mt-8 text-center">
+        <p class="text-sm text-gray-500">
+          需要支持其他平台？<a href="https://github.com/gandli/chat-export-toolkit/issues" target="_blank" rel="noopener" class="text-emerald-600 hover:underline">提交需求</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Section -->
+  <section id="trust" class="py-20 bg-gray-900 text-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">为什么值得信任</h2>
+        <p class="text-lg text-gray-400 max-w-2xl mx-auto">
+          独立开发者项目，透明开源，隐私优先
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">完全开源</h3>
+          <p class="text-gray-400">代码托管在 GitHub，MIT 许可，任何人都可审查、fork、贡献</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">本地处理</h3>
+          <p class="text-gray-400">所有数据在浏览器本地处理，不上传任何内容到外部服务器</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">透明可见</h3>
+          <p class="text-gray-400">无隐藏功能，无数据收集，代码即承诺</p>
+        </div>
+      </div>
+      
+      <div class="mt-12 text-center">
+        <p class="text-sm text-gray-500">
+          安全提示：请仅从官方 GitHub 仓库安装，不要安装来源不明的版本
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="py-20 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">常见问题</h2>
+        <p class="text-lg text-gray-600">
+          快速解答使用中的常见疑问
+        </p>
+      </div>
+      
+      <div class="space-y-6">
+        <!-- FAQ 1 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            ❓ 这个工具安全吗？会窃取我的对话数据吗？
+          </h3>
+          <p class="text-gray-600">
+            完全安全。所有代码开源可审查，数据处理完全在浏览器本地进行，不会上传任何内容到外部服务器。你可以查看源代码确认这一点。
+          </p>
+        </div>
+        
+        <!-- FAQ 2 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            ❓ 需要注册或付费吗？
+          </h3>
+          <p class="text-gray-600">
+            不需要。这是一个完全免费、开源的工具，无需注册、无需付费、无隐藏费用。
+          </p>
+        </div>
+        
+        <!-- FAQ 3 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            ❓ 支持哪些浏览器？
+          </h3>
+          <p class="text-gray-600">
+            Tampermonkey 脚本版本支持所有主流浏览器（Chrome、Edge、Firefox、Safari 等），只要能够安装 Tampermonkey 扩展即可使用。
+          </p>
+        </div>
+        
+        <!-- FAQ 4 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            ❓ 如何安装 Tampermonkey 脚本？
+          </h3>
+          <p class="text-gray-600">
+            1. 先在浏览器安装 <a href="https://www.tampermonkey.net/" target="_blank" rel="noopener" class="text-emerald-600 hover:underline">Tampermonkey 扩展</a><br>
+            2. 克隆或下载本仓库<br>
+            3. 按照 <a href="https://github.com/gandli/chat-export-toolkit#安装与构建" target="_blank" rel="noopener" class="text-emerald-600 hover:underline">安装说明</a> 构建并加载脚本<br>
+            4. 访问腾讯元宝等支持的 AI 平台页面，脚本会自动注入
+          </p>
+        </div>
+        
+        <!-- FAQ 5 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            ❓ 导出的数据格式有什么区别？
+          </h3>
+          <p class="text-gray-600">
+            <strong>Markdown</strong>：适合阅读、笔记软件导入（如 Obsidian、Notion）<br>
+            <strong>JSON</strong>：结构化数据，适合程序处理、二次开发<br>
+            <strong>DOCX</strong>：Word 文档格式，适合正式归档、打印
+          </p>
+        </div>
+        
+        <!-- FAQ 6 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            ❓ 如何反馈问题或请求新功能？
+          </h3>
+          <p class="text-gray-600">
+            欢迎在 <a href="https://github.com/gandli/chat-export-toolkit/issues" target="_blank" rel="noopener" class="text-emerald-600 hover:underline">GitHub Issues</a> 提交问题反馈或功能请求。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">开始使用</h2>
+      <p class="text-lg text-gray-600 mb-8">
+        立即体验轻量、可靠的 AI 对话导出方案
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <a href="https://github.com/gandli/chat-export-toolkit" 
+           target="_blank" 
+           rel="noopener"
+           class="btn-primary bg-gray-900 text-white px-8 py-3 rounded-lg font-semibold shadow-lg flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-2.028 1.029-2.716-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.688 1.028 1.623 1.028 2.716 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+          </svg>
+          访问 GitHub 仓库
+        </a>
+        <a href="https://github.com/gandli/chat-export-toolkit/issues" 
+           target="_blank" 
+           rel="noopener"
+           class="btn-primary bg-gray-100 text-gray-700 px-8 py-3 rounded-lg font-semibold">
+          提交反馈
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-50 border-t border-gray-200 py-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid md:grid-cols-3 gap-8 mb-8">
+        <div class="text-center md:text-left">
+          <p class="text-gray-900 font-semibold text-lg">Chat Export Toolkit</p>
+          <p class="text-sm text-gray-500 mt-2">多站点 AI 对话导出工具包</p>
+          <p class="text-xs text-gray-400 mt-1">版本 v0.7.0-alpha.1 · MIT License</p>
+          <p class="text-xs text-gray-400 mt-1">最后更新：2026-03-19</p>
+        </div>
+        <div class="text-center">
+          <p class="text-gray-900 font-semibold mb-3">快速链接</p>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#features" class="text-gray-600 hover:text-emerald-600 transition">功能特性</a></li>
+            <li><a href="#products" class="text-gray-600 hover:text-emerald-600 transition">产品形态</a></li>
+            <li><a href="https://github.com/gandli/chat-export-toolkit#安装与构建" target="_blank" rel="noopener" class="text-gray-600 hover:text-emerald-600 transition">安装说明</a></li>
+          </ul>
+        </div>
+        <div class="text-center md:text-right">
+          <p class="text-gray-900 font-semibold mb-3">资源</p>
+          <ul class="space-y-2 text-sm">
+            <li><a href="https://github.com/gandli/chat-export-toolkit" target="_blank" rel="noopener" class="text-gray-600 hover:text-emerald-600 transition">GitHub 仓库</a></li>
+            <li><a href="https://github.com/gandli/chat-export-toolkit/issues" target="_blank" rel="noopener" class="text-gray-600 hover:text-emerald-600 transition">问题反馈</a></li>
+            <li><a href="https://github.com/gandli/chat-export-toolkit/blob/main/CHANGELOG.md" target="_blank" rel="noopener" class="text-gray-600 hover:text-emerald-600 transition">更新日志</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-gray-200">
+        <div class="flex items-center space-x-4">
+          <a href="https://github.com/gandli/chat-export-toolkit" 
+             target="_blank" 
+             rel="noopener"
+             class="text-gray-500 hover:text-gray-900 transition">
+            <span class="sr-only">GitHub</span>
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-2.028 1.029-2.716-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.688 1.028 1.623 1.028 2.716 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+            </svg>
+          </a>
+        </div>
+        <p class="text-sm text-gray-500 text-center">
+          独立开发者项目 · 用爱发电 · 欢迎 Star 和贡献
+        </p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

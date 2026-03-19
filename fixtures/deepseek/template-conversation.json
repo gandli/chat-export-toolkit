@@ -1,0 +1,107 @@
+{
+  "_comment": "DeepSeek 平台标准化对话模板 - 用于测试开发，待替换为真实样本",
+  "_status": "TEMPLATE",
+  "_instructions": "此文件为 fixture 模板，遵循统一的 Conversation schema。采集真实 DeepSeek 样本后请复制此文件并替换为真实数据。",
+  "id": "deepseek-example-001",
+  "title": "DeepSeek 示例对话",
+  "messages": [
+    {
+      "id": "deepseek-msg-001",
+      "role": "user",
+      "content": {
+        "text": "你好，请介绍一下你自己。",
+        "attachments": []
+      },
+      "timestamp": 1710840000000,
+      "metadata": {
+        "platform": "deepseek",
+        "originalId": "deepseek-original-msg-001"
+      }
+    },
+    {
+      "id": "deepseek-msg-002",
+      "role": "assistant",
+      "content": {
+        "text": "<think>\n用户想了解我的基本信息。\n我需要简洁明了地介绍自己：\n1. 名称：深度求索（DeepSeek）\n2. 开发背景：深度求索公司研发\n3. 核心能力：语言理解、代码生成、逻辑推理等\n4. 特点：高效、准确、专业\n保持友好和专业的语气。\n</think>\n你好！我是 DeepSeek（深度求索），是由深度求索公司研发的大语言模型。\n\n我的核心能力包括：\n\n- **语言理解与生成**：流畅的中文和英文对话\n- **代码能力**：支持多种编程语言的代码生成和解释\n- **逻辑推理**：数学问题、逻辑分析\n- **知识问答**：涵盖多个领域的知识\n\n我致力于提供高效、准确、专业的帮助。有什么我可以帮你的吗？",
+        "attachments": []
+      },
+      "timestamp": 1710840005000,
+      "metadata": {
+        "platform": "deepseek",
+        "originalId": "deepseek-original-msg-002"
+      }
+    },
+    {
+      "id": "deepseek-msg-003",
+      "role": "user",
+      "content": {
+        "text": "请用 Python 实现一个快速排序算法，并解释其原理。",
+        "attachments": []
+      },
+      "timestamp": 1710840010000,
+      "metadata": {
+        "platform": "deepseek",
+        "originalId": "deepseek-original-msg-003"
+      }
+    },
+    {
+      "id": "deepseek-msg-004",
+      "role": "assistant",
+      "content": {
+        "text": "<think>\n用户要求实现快速排序并解释原理。\n我需要：\n1. 提供完整的 Python 实现代码\n2. 解释快速排序的核心思想\n3. 说明时间复杂度和空间复杂度\n4. 提供使用示例\n5. 可以补充优化版本\n\n快速排序要点：\n- 分治思想\n- 选择基准值（pivot）\n- 分区操作\n- 递归排序\n- 平均时间复杂度 O(n log n)\n- 最坏情况 O(n²)\n</think>\n好的！我来为你实现快速排序算法并详细解释其原理。
+
+## 快速排序原理
+
+快速排序（Quick Sort）是一种高效的排序算法，采用**分治法**（Divide and Conquer）策略。
+
+### 核心思想
+
+1. **选择基准值**（Pivot）：从数组中选择一个元素作为基准
+2. **分区操作**（Partition）：将数组分为两部分
+   - 左边部分：所有小于基准值的元素
+   - 右边部分：所有大于等于基准值的元素
+3. **递归排序**：对左右两部分递归应用快速排序
+
+### 时间复杂度
+
+- **平均情况**：O(n log n)
+- **最坏情况**：O(n²) - 当数组已排序且总是选择第一个元素为基准
+- **最好情况**：O(n log n)
+
+## Python 实现
+
+### 基础版本
+
+```python
+def quick_sort(arr):\n    \"\"\"\n    快速排序 - 基础版本\n    \n    Args:\n        arr: 待排序的列表\n    \n    Returns:\n        排序后的新列表\n    \"\"\"\n    # 递归终止条件：空列表或单元素列表已有序\n    if len(arr) <= 1:\n        return arr\n    \n    # 选择基准值（这里选择中间元素，避免最坏情况）\n    pivot = arr[len(arr) // 2]\n    \n    # 分区操作\n    left = [x for x in arr if x < pivot]      # 小于基准值\n    middle = [x for x in arr if x == pivot]   # 等于基准值\n    right = [x for x in arr if x > pivot]     # 大于基准值\n    \n    # 递归排序并合并\n    return quick_sort(left) + middle + quick_sort(right)\n\n\n# 测试示例\nif __name__ == \"__main__\":\n    test_array = [64, 34, 25, 12, 22, 11, 90, 88, 45, 50]\n    print(\"原始数组:\", test_array)\n    sorted_array = quick_sort(test_array)\n    print(\"排序后:\", sorted_array)\n```\n\n### 原地排序版本（空间优化）
+
+```python\ndef quick_sort_inplace(arr, low=0, high=None):\n    \"\"\"\n    快速排序 - 原地排序版本（空间复杂度 O(log n)）\n    \n    Args:\n        arr: 待排序的列表（原地修改）\n        low: 起始索引\n        high: 结束索引\n    \"\"\"\n    if high is None:\n        high = len(arr) - 1\n    \n    if low < high:\n        # 分区操作，返回基准值的最终位置\n        pivot_index = partition(arr, low, high)\n        \n        # 递归排序左右两部分\n        quick_sort_inplace(arr, low, pivot_index - 1)\n        quick_sort_inplace(arr, pivot_index + 1, high)\n    \n    return arr\n\n\ndef partition(arr, low, high):\n    \"\"\"\n    分区操作\n    \n    将数组分为：小于基准值 | 基准值 | 大于基准值\n    \n    Args:\n        arr: 待分区数组\n        low: 起始索引\n        high: 结束索引\n    \n    Returns:\n        基准值的最终位置索引\n    \"\"\"\n    # 选择最右边元素为基准值\n    pivot = arr[high]\n    i = low - 1  # i 指向小于 pivot 区域的最后一个元素\n    \n    for j in range(low, high):\n        if arr[j] <= pivot:\n            i += 1\n            arr[i], arr[j] = arr[j], arr[i]  # 交换\n    \n    # 将基准值放到正确位置\n    arr[i + 1], arr[high] = arr[high], arr[i + 1]\n    return i + 1\n\n\n# 测试示例\nif __name__ == \"__main__\":\n    test_array = [64, 34, 25, 12, 22, 11, 90, 88, 45, 50]\n    print(\"原始数组:\", test_array)\n    quick_sort_inplace(test_array)\n    print(\"排序后:\", test_array)\n```\n\n## 使用示例
+
+```python\n# 示例 1：整数排序\narr1 = [5, 2, 9, 1, 5, 6]\nprint(quick_sort(arr1))  # [1, 2, 5, 5, 6, 9]\n\n# 示例 2：浮点数排序\narr2 = [3.14, 2.71, 1.41, 0.58]\nprint(quick_sort(arr2))  # [0.58, 1.41, 2.71, 3.14]\n\n# 示例 3：字符串排序\narr3 = ['banana', 'apple', 'cherry', 'date']\nprint(quick_sort(arr3))  # ['apple', 'banana', 'cherry', 'date']\n```\n\n## 性能对比
+
+| 版本 | 时间复杂度 | 空间复杂度 | 特点 |\n|------|-----------|-----------|------|\n| 基础版本 | O(n log n) | O(n) | 代码简洁，易理解 |\n| 原地版本 | O(n log n) | O(log n) | 空间效率高 |\n\n## 优化建议
+
+1. **三数取中法**：选择 `arr[low]`, `arr[mid]`, `arr[high]` 的中值作为基准
+2. **小数组使用插入排序**：当子数组长度 < 10 时，使用插入排序更高效
+3. **三路快排**：处理大量重复元素时更高效
+
+需要我详细解释某个部分或提供其他优化版本吗？",
+        "attachments": []
+      },
+      "timestamp": 1710840015000,
+      "metadata": {
+        "platform": "deepseek",
+        "originalId": "deepseek-original-msg-004"
+      }
+    }
+  ],
+  "createdAt": 1710840000000,
+  "updatedAt": 1710840015000,
+  "metadata": {
+    "platform": "deepseek",
+    "participantCount": 2,
+    "messageCount": 4,
+    "source": "template",
+    "采集说明": "此文件为模板，真实样本需要从 https://chat.deepseek.com 采集 API 响应"
+  }
+}

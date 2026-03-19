@@ -1,0 +1,15 @@
+# 对话列表 API 请求 cURL 模板
+# 使用方法：
+# 1. 替换 Cookie 和 Authorization 为有效值（测试用）
+# 2. 执行：bash list-request.template.curl
+
+curl 'https://api.example.com/api/v1/conversation/list' \
+  -H 'Content-Type: application/json' \
+  -H 'Cookie: [REDACTED]' \
+  -H 'Authorization: [REDACTED]' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' \
+  --data-raw '{
+    "limit": 20,
+    "cursor": "",
+    "includeMetadata": true
+  }'

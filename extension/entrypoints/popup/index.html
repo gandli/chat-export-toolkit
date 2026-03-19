@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Export Toolkit</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <section class="card">
+        <p class="eyebrow">Chat Export Toolkit</p>
+        <h1 class="title">浏览器扩展 MVP</h1>
+        <p id="status" class="status">正在检测当前页面...</p>
+        <div class="actions">
+          <button id="export-json" class="button">导出 JSON</button>
+          <button id="export-markdown" class="button button-secondary">导出 Markdown</button>
+        </div>
+        <p id="result" class="result"></p>
+      </section>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+  </html>

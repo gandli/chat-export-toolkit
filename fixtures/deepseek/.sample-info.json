@@ -1,0 +1,38 @@
+{
+  "platform": "deepseek",
+  "capturedAt": "2026-03-19T10:29:51.719Z",
+  "capturedBy": "user",
+  "environment": {
+    "browser": "Chrome/Edge (请填写版本号)",
+    "os": "macOS/Windows/Linux (请填写版本)",
+    "userAgent": "Mozilla/5.0 ... (请填写完整 User-Agent)"
+  },
+  "apiVersion": "v1 (待验证)",
+  "endpoints": {
+    "detail": "/api/chat/detail (推测，待验证)",
+    "list": "/api/chat/list (推测，待验证)"
+  },
+  "sanitized": false,
+  "validated": false,
+  "notes": "请填写样本特点，如：包含 think 块、代码块、数学公式等",
+  "checklist": {
+    "detailResponse": false,
+    "listResponse": false,
+    "pageHtml": false,
+    "screenshots": false,
+    "sanitized": false,
+    "validated": false
+  },
+  "samples": {
+    "required": {
+      "detail": "detail-sample-001.json",
+      "list": "list-sample-001.json",
+      "page": "page-sample-001.html"
+    },
+    "recommended": {
+      "edge": "edge-sample-001.json",
+      "think": "think-sample-001.json",
+      "code": "code-sample-001.json"
+    }
+  }
+}

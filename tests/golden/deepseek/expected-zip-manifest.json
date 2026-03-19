@@ -1,0 +1,36 @@
+{
+  "_comment": "DeepSeek ZIP Export Manifest - Golden Test",
+  "_status": "TEMPLATE",
+  
+  "zipFilename": "deepseek-export-20260319.zip",
+  "format": "json",
+  "conversationCount": 1,
+  "files": [
+    {
+      "path": "001_DeepSeek 模板对话.json",
+      "type": "conversation",
+      "size": 2500
+    },
+    {
+      "path": "metadata.json",
+      "type": "metadata",
+      "size": 500
+    }
+  ],
+  "namingRules": {
+    "pattern": "{index}_{title}.{extension}",
+    "indexPadding": 3,
+    "titleMaxLength": 50,
+    "sanitizeSpecialChars": true
+  },
+  "validationChecks": {
+    "bitPerfectRequired": false,
+    "schemaValidationRequired": true,
+    "manifestMatchRequired": true
+  },
+  "metadata": {
+    "exportedAt": "2026-03-19T17:00:00.000Z",
+    "platform": "deepseek",
+    "toolVersion": "0.1.0-template"
+  }
+}

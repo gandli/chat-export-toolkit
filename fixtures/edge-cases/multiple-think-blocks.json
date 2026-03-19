@@ -1,0 +1,40 @@
+{
+  "_comment": "边界情况测试：包含多个 think 块的消息",
+  "id": "edge-multi-think-001",
+  "title": "多个 Think 块测试",
+  "messages": [
+    {
+      "id": "msg-001",
+      "role": "user",
+      "content": {
+        "text": "请分析这个问题。",
+        "attachments": []
+      },
+      "timestamp": 1710840000000,
+      "metadata": {
+        "platform": "yuanbao",
+        "originalIndex": 0
+      }
+    },
+    {
+      "id": "msg-002",
+      "role": "assistant",
+      "content": {
+        "text": "> [Think] 第一个思考块：理解问题\n> 用户提出了一个需要分析的问题。\n\n> [Think] 第二个思考块：分析思路\n> 我需要从多个角度来分析这个问题。\n\n> [Think] 第三个思考块：组织答案\n> 最后，我需要清晰地呈现分析结果。\n\n好的，我来分析这个问题：\n\n1. 首先，从表面来看...\n2. 其次，深入分析...\n3. 最后，总结建议...",
+        "attachments": []
+      },
+      "timestamp": 1710840005000,
+      "metadata": {
+        "platform": "yuanbao",
+        "originalIndex": 1
+      }
+    }
+  ],
+  "createdAt": 1710840000000,
+  "updatedAt": 1710840005000,
+  "metadata": {
+    "platform": "yuanbao",
+    "participantCount": 2,
+    "messageCount": 2
+  }
+}

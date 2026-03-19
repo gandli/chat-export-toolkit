@@ -1,0 +1,13 @@
+{
+  "_comment": "边界情况测试：空对话（无消息）",
+  "id": "edge-empty-001",
+  "title": "空对话测试",
+  "messages": [],
+  "createdAt": 1710840000000,
+  "updatedAt": 1710840000000,
+  "metadata": {
+    "platform": "yuanbao",
+    "participantCount": 0,
+    "messageCount": 0
+  }
+}

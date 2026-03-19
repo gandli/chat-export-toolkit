@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZIP Export Test - Chat Export Toolkit V2</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 10px;
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .status.success { background: #d4edda; color: #155724; }
+    .status.error { background: #f8d7da; color: #721c24; }
+    .status.info { background: #d1ecf1; color: #0c5460; }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px 10px 0;
+    }
+    button:hover { background: #0056b3; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    .log {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      padding: 15px;
+      margin-top: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+    }
+    .log-entry {
+      margin: 5px 0;
+      padding: 5px;
+      border-left: 3px solid #007bff;
+      padding-left: 10px;
+    }
+    .log-entry.error { border-left-color: #dc3545; color: #dc3545; }
+    .log-entry.success { border-left-color: #28a745; color: #28a745; }
+    code {
+      background: #f8f9fa;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📦 ZIP Export Test</h1>
+    <p>测试 Chat Export Toolkit V2 的 ZIP 批量导出功能</p>
+    
+    <div id="status" class="status info">准备就绪</div>
+    
+    <div>
+      <button id="btn-json" onclick="testExport('json')">导出 JSON ZIP</button>
+      <button id="btn-md" onclick="testExport('markdown')">导出 Markdown ZIP</button>
+      <button id="btn-clear" onclick="clearLog()">清空日志</button>
+    </div>
+    
+    <div class="log" id="log"></div>
+  </div>
+
+  <script type="module">
+    // 模拟 ChatExportToolkit（实际使用时应导入构建后的 userscript）
+    class MockToolkit {
+      async init(config) {
+        log('初始化 Toolkit...', 'info');
+        console.log('[MockToolkit] Init config:', config);
+        return this;
+      }
+
+      async exportAllConversations(format) {
+        log(`开始导出 ${format} 格式...`, 'info');
+        
+        // 模拟导出过程
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        log('创建测试对话数据...', 'info');
+        
+        // 创建测试数据
+        const conversations = [
+          {
+            id: 'test_001',
+            title: '测试对话 1',
+            messages: [
+              {
+                id: 'msg_001',
+                role: 'user',
+                content: { text: '你好，这是第一个测试对话' },
+                timestamp: Date.now() - 120000,
+              },
+              {
+                id: 'msg_002',
+                role: 'assistant',
+                content: { text: '你好！这是第一个演示对话。' },
+                timestamp: Date.now() - 60000,
+              },
+            ],
+            createdAt: Date.now() - 120000,
+            updatedAt: Date.now() - 60000,
+          },
+          {
+            id: 'test_002',
+            title: '测试对话 2',
+            messages: [
+              {
+                id: 'msg_003',
+                role: 'user',
+                content: { text: '请问如何学习编程？' },
+                timestamp: Date.now() - 60000,
+              },
+              {
+                id: 'msg_004',
+                role: 'assistant',
+                content: { text: '学习编程的建议：\n1. 选择一门语言开始\n2. 多做练习\n3. 参与实际项目' },
+                timestamp: Date.now(),
+              },
+            ],
+            createdAt: Date.now() - 60000,
+            updatedAt: Date.now(),
+          },
+          {
+            id: 'test_003',
+            title: '测试对话 3 - 数据分析',
+            messages: [
+              {
+                id: 'msg_005',
+                role: 'user',
+                content: { text: '帮我分析这个数据集' },
+                timestamp: Date.now() - 30000,
+              },
+              {
+                id: 'msg_006',
+                role: 'assistant',
+                content: { text: '好的，我来帮你分析这个数据集。\n\n首先，我们来看看数据的基本统计信息...' },
+                timestamp: Date.now(),
+              },
+            ],
+            createdAt: Date.now() - 30000,
+            updatedAt: Date.now(),
+          },
+        ];
+
+        log(`找到 ${conversations.length} 个对话`, 'info');
+
+        // 使用 ZIPExporter
+        const { ZIPExporter } = await import('./src/exporters/zip.ts');
+        const exporter = new ZIPExporter();
+
+        log('生成 ZIP 文件...', 'info');
+        
+        const result = await exporter.exportAll(conversations, {
+          format: format === 'markdown' ? 'markdown' : 'json',
+          includeMetadata: true,
+        });
+
+        if (result.success) {
+          log(`✅ 导出成功！`, 'success');
+          log(`  - 文件名：${result.outputPath}`, 'success');
+          log(`  - 对话数：${result.stats?.conversationCount}`, 'success');
+          log(`  - 消息数：${result.stats?.messageCount}`, 'success');
+        } else {
+          log(`❌ 导出失败：${result.error}`, 'error');
+        }
+
+        return result;
+      }
+    }
+
+    // 全局函数
+    window.testExport = async function(format) {
+      const btn = document.getElementById(`btn-${format === 'json' ? 'json' : 'md'}`);
+      btn.disabled = true;
+      
+      updateStatus('正在导出...', 'info');
+      
+      try {
+        const toolkit = new MockToolkit();
+        await toolkit.init({ platform: 'test' });
+        const result = await toolkit.exportAllConversations(format);
+        
+        if (result.success) {
+          updateStatus('✅ 导出成功！', 'success');
+        } else {
+          updateStatus('❌ 导出失败', 'error');
+        }
+      } catch (error) {
+        log(`异常：${error.message}`, 'error');
+        updateStatus('❌ 发生错误', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    window.clearLog = function() {
+      document.getElementById('log').innerHTML = '';
+      updateStatus('准备就绪', 'info');
+    };
+
+    // 辅助函数
+    function log(message, type = 'info') {
+      const logDiv = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+      console.log(`[ZIP Test] ${message}`);
+    }
+
+    function updateStatus(message, type) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.textContent = message;
+      statusDiv.className = `status ${type}`;
+    }
+
+    // 初始化日志
+    log('ZIP Export Test 页面已加载', 'info');
+    log('提示：此页面用于测试 ZIP 导出功能', 'info');
+  </script>
+</body>
+</html>

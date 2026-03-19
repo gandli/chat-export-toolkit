@@ -1,0 +1,54 @@
+{
+  "conversationId": "[CONVERSATION_ID]",
+  "sessionTitle": "[会话标题]",
+  "convs": [
+    {
+      "speaker": "user",
+      "index": 1,
+      "speechesV2": [
+        {
+          "content": [
+            {
+              "type": "text",
+              "msg": "[消息内容]"
+            }
+          ]
+        }
+      ],
+      "createTime": 1710840000000
+    },
+    {
+      "speaker": "ai",
+      "index": 2,
+      "speechesV2": [
+        {
+          "content": [
+            {
+              "type": "think",
+              "title": "思考",
+              "content": "[思考内容]"
+            },
+            {
+              "type": "text",
+              "msg": "[消息内容]"
+            }
+          ]
+        }
+      ],
+      "createTime": 1710840005000
+    }
+  ],
+  "createTime": 1710840000000,
+  "updateTime": 1710840005000,
+  "metadata": {
+    "messageCount": 2,
+    "participantCount": 2
+  },
+  "_meta": {
+    "platform": "yuanbao",
+    "apiVersion": "v2",
+    "endpoint": "/api/user/agent/conversation/v2/detail",
+    "sanitized": true,
+    "note": "这是一个示例模板文件，请替换为从真实 Yuanbao 页面采集的数据。运行 bun run scripts/capture-yuanbao-samples.ts 进行采集。"
+  }
+}

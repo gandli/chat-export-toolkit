@@ -1,0 +1,78 @@
+{
+  "_comment": "V1 Yuanbao 原始 API 响应样本 - 用于格式对齐测试",
+  "conversationId": "test-conv-001",
+  "sessionTitle": "测试会话 - V1 格式",
+  "title": "测试会话",
+  "convs": [
+    {
+      "index": 0,
+      "speaker": "user",
+      "createTime": 1710840000000,
+      "speechesV2": [
+        {
+          "content": [
+            {
+              "type": "text",
+              "msg": "你好，请介绍一下你自己。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "speaker": "ai",
+      "createTime": 1710840005000,
+      "speechesV2": [
+        {
+          "content": [
+            {
+              "type": "think",
+              "title": "思考过程",
+              "content": "用户想了解我的基本信息。我需要简洁地介绍自己的功能和定位。"
+            },
+            {
+              "type": "text",
+              "msg": "你好！我是腾讯元宝，由腾讯公司开发的 AI 助手。我可以帮助你：\n\n1. 回答各种问题\n2. 协助写作和编辑\n3. 提供建议和方案\n4. 进行对话交流\n\n有什么我可以帮助你的吗？"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "speaker": "user",
+      "createTime": 1710840010000,
+      "speechesV2": [
+        {
+          "content": [
+            {
+              "type": "text",
+              "msg": "能帮我写一段 TypeScript 代码吗？"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "speaker": "ai",
+      "createTime": 1710840015000,
+      "speechesV2": [
+        {
+          "content": [
+            {
+              "type": "think",
+              "title": "",
+              "content": "用户需要 TypeScript 代码示例。我应该提供一个实用的例子，比如一个工具函数。"
+            },
+            {
+              "type": "text",
+              "msg": "当然可以！下面是一个 TypeScript 工具函数示例：\n\n```typescript\nfunction formatDate(date: Date): string {\n  const year = date.getFullYear();\n  const month = String(date.getMonth() + 1).padStart(2, '0');\n  const day = String(date.getDate()).padStart(2, '0');\n  return `${year}-${month}-${day}`;\n}\n```\n\n这个函数将 Date 对象格式化为 YYYY-MM-DD 格式的字符串。"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "_meta": {
+    "platform": "{platform}",
+    "capturedAt": "YYYY-MM-DDTHH:mm:ss.sssZ",
+    "apiVersion": "v1",
+    "endpoint": "/api/xxx/conversation/detail",
+    "description": "对话详情 API 响应模板"
+  },
+  "conversationId": "[CONVERSATION_ID]",
+  "sessionTitle": "示例对话标题",
+  "convs": [
+    {
+      "speaker": "user",
+      "index": 1,
+      "timestamp": 1710840000000,
+      "speechesV2": [
+        {
+          "content": [
+            {
+              "type": "text",
+              "msg": "这是用户消息示例内容"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "speaker": "ai",
+      "index": 2,
+      "timestamp": 1710840001000,
+      "speechesV2": [
+        {
+          "content": [
+            {
+              "type": "think",
+              "title": "思考过程",
+              "content": "这是 AI 的思考过程示例"
+            },
+            {
+              "type": "text",
+              "msg": "这是 AI 的回复内容示例"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "createTime": 1710840000000,
+  "updateTime": 1710840001000,
+  "metadata": {
+    "messageCount": 2,
+    "participantCount": 2,
+    "model": "example-model-v1"
+  }
+}

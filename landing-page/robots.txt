@@ -1,0 +1,8 @@
+# Chat Export Toolkit - Robots.txt
+# https://github.com/gandli/chat-export-toolkit
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://gandli.github.io/chat-export-toolkit/sitemap.xml

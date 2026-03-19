@@ -1,0 +1,57 @@
+name: 💡 功能请求
+description: 提出新功能建议或改进意见
+title: "[Feature] 简要描述功能"
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢建议！请提供以下信息帮助我们评估。
+        
+        > 📋 当前版本：v0.7.0-alpha.1  
+        > 🗺️ 查看 [路线图](https://github.com/your-repo/chat-export-toolkit/blob/main/docs/ALPHA_STATUS.md#路线图) 了解规划中的功能
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 相关痛点
+      description: 这个功能解决了什么问题？
+      placeholder: 例如：导出大量对话时效率低、不支持某平台等
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 建议方案
+      description: 你希望如何实现这个功能？
+      placeholder: 描述功能的具体行为、交互方式等
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 替代方案
+      description: 是否考虑过其他解决方案？
+      placeholder: 如有，请说明
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 优先级
+      description: 这个功能对你的重要程度？
+      options:
+        - 🟢 低 - 有了更好
+        - 🟡 中 - 比较需要
+        - 🔴 高 - 必须功能
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 确认事项
+      options:
+        - label: 已查看 [路线图](https://github.com/your-repo/chat-export-toolkit/blob/main/docs/ALPHA_STATUS.md#路线图)，该功能尚未规划
+        - label: 已搜索现有 Issue，无重复建议

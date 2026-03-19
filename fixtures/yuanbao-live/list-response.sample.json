@@ -1,0 +1,29 @@
+{
+  "code": 0,
+  "msg": "success",
+  "conversations": [
+    {
+      "conversationId": "[CONVERSATION_ID_1]",
+      "title": "[会话标题 1]",
+      "createTime": 1710840000000,
+      "updateTime": 1710840010000,
+      "messageCount": 10
+    },
+    {
+      "conversationId": "[CONVERSATION_ID_2]",
+      "title": "[会话标题 2]",
+      "createTime": 1710830000000,
+      "updateTime": 1710835000000,
+      "messageCount": 5
+    }
+  ],
+  "hasMore": true,
+  "nextCursor": "[CURSOR]",
+  "_meta": {
+    "platform": "yuanbao",
+    "apiVersion": "v2",
+    "endpoint": "/api/user/agent/conversation/v2/list",
+    "sanitized": true,
+    "note": "这是一个示例模板文件，请替换为从真实 Yuanbao 页面采集的数据。运行 bun run scripts/capture-yuanbao-samples.ts 进行采集。"
+  }
+}
