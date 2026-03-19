@@ -1,0 +1,83 @@
+{
+  "_comment": "DeepSeek Golden Test - JSON 预期输出",
+  "_status": "TEMPLATE",
+  
+  "id": "deepseek-template-001",
+  "title": "DeepSeek 模板对话",
+  "messages": [
+    {
+      "id": "deepseek-template-001_msg_msg-template-001",
+      "role": "user",
+      "content": {
+        "text": "你好，请介绍一下你自己。",
+        "attachments": []
+      },
+      "timestamp": 1710840000000,
+      "metadata": {
+        "platform": "deepseek",
+        "originalId": "msg-template-001",
+        "originalRole": "user"
+      }
+    },
+    {
+      "id": "deepseek-template-001_msg_msg-template-002",
+      "role": "assistant",
+      "content": {
+        "text": "> [Reasoning]\n> 用户想了解我的基本信息。我需要简洁明了地介绍自己。\n\n你好！我是 DeepSeek（深度求索），是由深度求索公司研发的大语言模型。\n\n我的核心能力包括：\n\n- **语言理解与生成**：流畅的中文和英文对话\n- **代码能力**：支持多种编程语言的代码生成和解释\n- **逻辑推理**：数学问题、逻辑分析\n- **知识问答**：涵盖多个领域的知识",
+        "attachments": [],
+        "metadata": {
+          "blockTypes": ["reasoning", "text"],
+          "hasReasoning": true
+        }
+      },
+      "timestamp": 1710840005000,
+      "metadata": {
+        "platform": "deepseek",
+        "originalId": "msg-template-002",
+        "originalRole": "assistant",
+        "model": "deepseek-chat"
+      }
+    },
+    {
+      "id": "deepseek-template-001_msg_msg-template-003",
+      "role": "user",
+      "content": {
+        "text": "请用 Python 实现一个快速排序算法。",
+        "attachments": []
+      },
+      "timestamp": 1710840010000,
+      "metadata": {
+        "platform": "deepseek",
+        "originalId": "msg-template-003",
+        "originalRole": "user"
+      }
+    },
+    {
+      "id": "deepseek-template-001_msg_msg-template-004",
+      "role": "assistant",
+      "content": {
+        "text": "> [Reasoning]\n> 用户要求实现快速排序。我需要提供完整的代码实现和简要解释。\n\n好的！下面是快速排序的 Python 实现：\n\n```python\ndef quick_sort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]\n    middle = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n    return quick_sort(left) + middle + quick_sort(right)\n```",
+        "attachments": [],
+        "metadata": {
+          "blockTypes": ["reasoning", "text", "code"],
+          "hasReasoning": true
+        }
+      },
+      "timestamp": 1710840015000,
+      "metadata": {
+        "platform": "deepseek",
+        "originalId": "msg-template-004",
+        "originalRole": "assistant",
+        "model": "deepseek-chat"
+      }
+    }
+  ],
+  "createdAt": 1710840000000,
+  "updatedAt": 1710840015000,
+  "metadata": {
+    "platform": "deepseek",
+    "participantCount": 2,
+    "messageCount": 4,
+    "model": "deepseek-chat"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "_comment": "Yuanbao Edge Case - 空消息和特殊内容",
+  "_source": "fixtures/yuanbao/raw/edge-case-001.json",
+  "_description": "测试空消息、无 think 标题、特殊字符等边界情况",
+
+  "platform": "yuanbao",
+  "data": {
+    "conversationId": "yuanbao_edge_001",
+  "sessionTitle": "Edge Case Test",
+  "title": "边界测试",
+  "convs": [
+    {
+      "index": 0,
+      "speaker": "user",
+      "createTime": 1710850000000,
+      "speechesV2": [
+        {
+          "content": []
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "speaker": "ai",
+      "createTime": 1710850005000,
+      "speechesV2": [
+        {
+          "content": [
+            {
+              "type": "think",
+              "title": "",
+              "content": "用户发送了空消息，我需要礼貌地回应。"
+            },
+            {
+              "type": "text",
+              "msg": "您好！看起来您发送了一条空消息。有什么我可以帮助您的吗？"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "speaker": "user",
+      "createTime": 1710850010000,
+      "speechesV2": [
+        {
+          "content": [
+            {
+              "type": "text",
+              "msg": "测试特殊字符：@#$%^&*() 和 emoji 🎉🚀"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "speaker": "ai",
+      "createTime": 1710850015000,
+      "speechesV2": [
+        {
+          "content": [
+            {
+              "type": "text",
+              "msg": "收到！特殊字符和 emoji 都能正常显示：@#$%^&*() 🎉🚀"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "createTime": 1710850000000,
+  "updateTime": 1710850015000
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "_comment": "边界情况测试：单条消息",
+  "id": "edge-single-001",
+  "title": "单条消息测试",
+  "messages": [
+    {
+      "id": "msg-001",
+      "role": "user",
+      "content": {
+        "text": "这是唯一的一条消息。",
+        "attachments": []
+      },
+      "timestamp": 1710840000000,
+      "metadata": {
+        "platform": "yuanbao",
+        "originalIndex": 0
+      }
+    }
+  ],
+  "createdAt": 1710840000000,
+  "updatedAt": 1710840000000,
+  "metadata": {
+    "platform": "yuanbao",
+    "participantCount": 1,
+    "messageCount": 1
+  }
+}

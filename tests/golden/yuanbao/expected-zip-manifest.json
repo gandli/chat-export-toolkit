@@ -1,0 +1,52 @@
+{
+  "_comment": "Yuanbao Golden Test - ZIP Export Manifest 预期输出",
+  "_source": "fixtures/yuanbao/normalized/normalized-001.json",
+  "_exporter": "src/exporters/zip.ts",
+  "_description": "ZIP 导出的文件清单和 metadata.json 基准输出",
+
+  "zipFilename": "chat-export-json-20240319T172000.zip",
+  "format": "json",
+  "exportedAt": "2024-03-19T17:20:00.000Z",
+  "files": [
+    {
+      "path": "001_Golden_Test_TypeScript_代码示例_2024-03-19.json",
+      "type": "conversation",
+      "conversationId": "yuanbao_golden_001",
+      "messageCount": 4,
+      "size": 2439
+    },
+    {
+      "path": "metadata.json",
+      "type": "metadata",
+      "description": "ZIP 导出元数据汇总"
+    }
+  ],
+  "metadata": {
+    "conversationCount": 1,
+    "totalMessages": 4,
+    "format": "json",
+    "conversations": [
+      {
+        "id": "yuanbao_golden_001",
+        "title": "Golden Test - TypeScript 代码示例",
+        "messageCount": 4,
+        "createdAt": 1710840000000,
+        "updatedAt": 1710840015000,
+        "filename": "001_Golden_Test_TypeScript_代码示例_2024-03-19.json"
+      }
+    ]
+  },
+  "namingRules": {
+    "pattern": "{index}_{title}_{date}.{extension}",
+    "indexPadding": 3,
+    "titleMaxLength": 50,
+    "titleSafeChars": "a-z0-9\u4e00-\u9fa5_",
+    "dateFormat": "YYYY-MM-DD"
+  },
+  "validationChecks": {
+    "fileListPresent": true,
+    "metadataPresent": true,
+    "namingConventionFollowed": true,
+    "bitPerfectRequired": false
+  }
+}

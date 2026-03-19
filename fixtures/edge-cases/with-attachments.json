@@ -1,0 +1,57 @@
+{
+  "_comment": "边界情况测试：包含附件引用的消息（模拟）",
+  "id": "edge-attachments-001",
+  "title": "附件测试",
+  "messages": [
+    {
+      "id": "msg-001",
+      "role": "user",
+      "content": {
+        "text": "请分析这个文档。",
+        "attachments": [
+          {
+            "type": "file",
+            "name": "report.pdf",
+            "url": "https://example.com/files/report.pdf",
+            "size": 1024000,
+            "mimeType": "application/pdf"
+          }
+        ]
+      },
+      "timestamp": 1710840000000,
+      "metadata": {
+        "platform": "yuanbao",
+        "originalIndex": 0
+      }
+    },
+    {
+      "id": "msg-002",
+      "role": "assistant",
+      "content": {
+        "text": "我已经分析了您上传的文档 `report.pdf`。\n\n主要发现：\n1. 文档包含 50 页内容\n2. 主要讨论了市场趋势\n3. 关键数据在第 25 页\n\n需要我详细解释哪个部分吗？",
+        "attachments": [
+          {
+            "type": "image",
+            "name": "chart-summary.png",
+            "url": "https://example.com/images/chart-summary.png",
+            "size": 256000,
+            "mimeType": "image/png",
+            "description": "数据汇总图表"
+          }
+        ]
+      },
+      "timestamp": 1710840005000,
+      "metadata": {
+        "platform": "yuanbao",
+        "originalIndex": 1
+      }
+    }
+  ],
+  "createdAt": 1710840000000,
+  "updatedAt": 1710840005000,
+  "metadata": {
+    "platform": "yuanbao",
+    "participantCount": 2,
+    "messageCount": 2
+  }
+}

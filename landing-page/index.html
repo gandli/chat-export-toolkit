@@ -39,6 +39,10 @@
       --secondary: #0ea5e9;
     }
     
+    html {
+      scroll-behavior: smooth;
+    }
+    
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
@@ -54,6 +58,66 @@
     .feature-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Button hover effects */
+    .btn-primary {
+      transition: all 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-secondary {
+      transition: all 0.2s ease;
+    }
+    
+    .btn-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.35);
+    }
+    
+    /* Mockup placeholder styles */
+    .mockup-placeholder {
+      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+      border: 2px dashed #9ca3af;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .mockup-placeholder::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+      animation: shimmer 3s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) rotate(45deg); }
+    }
+    
+    .mockup-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    /* Anchor offset for sticky nav */
+    section[id] {
+      scroll-margin-top: 4rem;
     }
   </style>
 </head>
@@ -107,6 +171,62 @@
       <p class="mt-6 text-sm text-white/80">
         🔒 本地处理 · 无需注册 · 隐私优先
       </p>
+    </div>
+  </section>
+
+  <!-- Demo / Mockup Section -->
+  <section class="py-20 bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">界面预览</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          简洁直观的界面设计，无缝融入 AI 平台原生体验
+        </p>
+      </div>
+      
+      <div class="max-w-4xl mx-auto">
+        <!-- Mockup Placeholder - 明确标注为占位图 -->
+        <div class="mockup-placeholder">
+          <div class="mockup-content">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <p class="text-gray-500 font-medium text-lg mb-2">界面截图占位区</p>
+            <p class="text-gray-400 text-sm max-w-md">
+              此处将展示实际工具在 AI 平台页面中的运行效果截图<br>
+              <span class="text-xs text-gray-400 mt-2 inline-block bg-gray-200 px-2 py-1 rounded">Mockup Placeholder - 待补充真实截图</span>
+            </p>
+          </div>
+        </div>
+        
+        <!-- Feature highlights below mockup -->
+        <div class="grid md:grid-cols-3 gap-6 mt-8">
+          <div class="text-center">
+            <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <p class="text-sm text-gray-600">页面内嵌 UI</p>
+          </div>
+          <div class="text-center">
+            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <p class="text-sm text-gray-600">一键导出</p>
+          </div>
+          <div class="text-center">
+            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <p class="text-sm text-gray-600">多格式支持</p>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 

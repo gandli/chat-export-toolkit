@@ -1,0 +1,30 @@
+{
+  "_meta": {
+    "platform": "{platform}",
+    "capturedAt": "YYYY-MM-DDTHH:mm:ss.sssZ",
+    "apiVersion": "v1",
+    "endpoint": "/api/xxx/conversation/list",
+    "description": "对话列表 API 响应模板"
+  },
+  "conversations": [
+    {
+      "conversationId": "[CONVERSATION_ID_1]",
+      "title": "示例对话标题 1",
+      "createTime": 1710840000000,
+      "updateTime": 1710840001000,
+      "messageCount": 10,
+      "preview": "这是对话预览内容..."
+    },
+    {
+      "conversationId": "[CONVERSATION_ID_2]",
+      "title": "示例对话标题 2",
+      "createTime": 1710750000000,
+      "updateTime": 1710750010000,
+      "messageCount": 5,
+      "preview": "这是另一段对话预览..."
+    }
+  ],
+  "hasMore": false,
+  "nextCursor": "",
+  "totalCount": 2
+}

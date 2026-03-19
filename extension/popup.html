@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Export Toolkit</title>
+  </head>
+  <body>
+    <main class="popup-shell">
+      <section class="hero">
+        <p class="eyebrow">Browser Extension MVP</p>
+        <h1>导出 AI 聊天记录</h1>
+        <p class="subtitle">先支持 Chrome / Edge，MVP 先把“当前对话导出”跑通。</p>
+      </section>
+
+      <section class="panel">
+        <div class="status-row">
+          <span>当前站点</span>
+          <strong id="provider-name">检测中...</strong>
+        </div>
+        <p id="provider-detail" class="muted">正在查询当前标签页。</p>
+      </section>
+
+      <section class="panel actions">
+        <button id="export-markdown" class="primary" type="button">导出 Markdown</button>
+        <button id="export-json" class="secondary" type="button">导出 JSON</button>
+      </section>
+
+      <section class="panel roadmap">
+        <p class="muted">MVP 首批平台：ChatGPT、Claude、Kimi、元宝。当前已接入：ChatGPT。</p>
+      </section>
+    </main>
+
+    <script type="module" src="/src/popup/main.ts"></script>
+  </body>
+</html>

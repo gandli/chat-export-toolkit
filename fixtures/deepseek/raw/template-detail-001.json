@@ -1,0 +1,61 @@
+{
+  "_comment": "DeepSeek 原始 API 响应模板 - 用于测试开发，待替换为真实样本",
+  "_status": "TEMPLATE",
+  "_instructions": "此文件为 fixture 模板，定义预期的 DeepSeek API 响应结构。采集真实样本后请复制此文件并替换为真实数据，命名为 detail-sample-001.json。",
+  "_采集说明": "从 https://chat.deepseek.com 使用开发者工具 Network 面板捕获对话详情 API 响应",
+  
+  "platform": "deepseek",
+  "data": {
+    "id": "deepseek-template-001",
+    "conversation_id": "deepseek-template-001",
+    "title": "DeepSeek 模板对话",
+    "created_at": 1710840000000,
+    "updated_at": 1710840015000,
+    "model": "deepseek-chat",
+    
+    "messages": [
+      {
+        "id": "msg-template-001",
+        "role": "user",
+        "content": "你好，请介绍一下你自己。",
+        "created_at": 1710840000000,
+        "metadata": {}
+      },
+      {
+        "id": "msg-template-002",
+        "role": "assistant",
+        "content": "你好！我是 DeepSeek（深度求索），是由深度求索公司研发的大语言模型。\n\n我的核心能力包括：\n\n- **语言理解与生成**：流畅的中文和英文对话\n- **代码能力**：支持多种编程语言的代码生成和解释\n- **逻辑推理**：数学问题、逻辑分析\n- **知识问答**：涵盖多个领域的知识",
+        "created_at": 1710840005000,
+        "reasoning_content": "用户想了解我的基本信息。我需要简洁明了地介绍自己。",
+        "metadata": {
+          "model": "deepseek-chat"
+        }
+      },
+      {
+        "id": "msg-template-003",
+        "role": "user",
+        "content": "请用 Python 实现一个快速排序算法。",
+        "created_at": 1710840010000,
+        "metadata": {}
+      },
+      {
+        "id": "msg-template-004",
+        "role": "assistant",
+        "content": "好的！下面是快速排序的 Python 实现：\n\n```python\ndef quick_sort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]\n    middle = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n    return quick_sort(left) + middle + quick_sort(right)\n```",
+        "created_at": 1710840015000,
+        "reasoning_content": "用户要求实现快速排序。我需要提供完整的代码实现和简要解释。",
+        "metadata": {
+          "model": "deepseek-chat",
+          "has_code": true
+        }
+      }
+    ],
+    
+    "metadata": {
+      "message_count": 4,
+      "participant_count": 2,
+      "source": "template",
+      "采集说明": "此文件为模板，真实样本需要从 https://chat.deepseek.com 采集 API 响应"
+    }
+  }
+}

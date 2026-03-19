@@ -1,0 +1,15 @@
+# 对话详情 API 请求 cURL 模板
+# 使用方法：
+# 1. 替换 [CONVERSATION_ID] 为实际对话 ID
+# 2. 替换 Cookie 和 Authorization 为有效值（测试用）
+# 3. 执行：bash detail-request.template.curl
+
+curl 'https://api.example.com/api/v1/conversation/detail' \
+  -H 'Content-Type: application/json' \
+  -H 'Cookie: [REDACTED]' \
+  -H 'Authorization: [REDACTED]' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' \
+  --data-raw '{
+    "conversationId": "[CONVERSATION_ID]",
+    "includeMetadata": true
+  }'

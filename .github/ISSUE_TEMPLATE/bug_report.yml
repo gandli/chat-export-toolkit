@@ -1,0 +1,61 @@
+name: 🐛 Bug 报告
+description: 报告在 Alpha 版本中遇到的问题
+title: "[Bug] 简要描述问题"
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈！请提供以下信息帮助我们定位问题。
+        
+        > ⚠️ 当前为 Alpha 版本 (v0.7.0-alpha.1)，部分功能可能不完整。请先查看 [已知限制](https://github.com/your-repo/chat-export-toolkit/blob/main/docs/ALPHA_STATUS.md#已知限制)。
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 平台
+      description: 在哪个平台上遇到问题？
+      options:
+        - 腾讯元宝 (yuanbao.tencent.com)
+        - ChatGPT (chatgpt.com)
+        - 其他（请说明）
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+      description: 请详细描述遇到的问题
+      placeholder: 包括操作步骤、预期结果、实际结果
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境信息
+      description: 浏览器、操作系统、脚本版本等
+      value: |
+        - 浏览器：Chrome/Firefox/Safari (版本)
+        - 操作系统：macOS/Windows/Linux
+        - 脚本版本：v0.7.0-alpha.1
+        - Tampermonkey 版本：
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 控制台日志
+      description: 如有错误，请粘贴浏览器控制台日志
+      render: shell
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 确认事项
+      options:
+        - label: 已查看 [Alpha 状态说明](https://github.com/your-repo/chat-export-toolkit/blob/main/docs/ALPHA_STATUS.md) 中的已知限制
+        - label: 已尝试刷新页面或重新安装脚本
+        - label: 未包含敏感信息（对话内容、账号等）

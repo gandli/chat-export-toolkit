@@ -1,0 +1,40 @@
+{
+  "_comment": "边界情况测试：包含特殊字符的消息",
+  "id": "edge-special-chars-001",
+  "title": "特殊字符测试",
+  "messages": [
+    {
+      "id": "msg-001",
+      "role": "user",
+      "content": {
+        "text": "测试特殊字符：& < > \" ' \\n \\t \\r",
+        "attachments": []
+      },
+      "timestamp": 1710840000000,
+      "metadata": {
+        "platform": "yuanbao",
+        "originalIndex": 0
+      }
+    },
+    {
+      "id": "msg-002",
+      "role": "assistant",
+      "content": {
+        "text": "特殊字符测试响应：\n\n- HTML 实体：&amp; &lt; &gt; &quot; &apos;\n- Markdown 符号：* _ ` # [ ] ( )\n- 代码块：```const x = \"test\";```\n- 数学符号：∑ ∏ ∫ √ ∞\n- Emoji: 🎉 ✅ ❌ 🚀\n- 中文标点：，。、；：？！（）【】《》\n- 其他：© ® ™ € £ ¥",
+        "attachments": []
+      },
+      "timestamp": 1710840005000,
+      "metadata": {
+        "platform": "yuanbao",
+        "originalIndex": 1
+      }
+    }
+  ],
+  "createdAt": 1710840000000,
+  "updatedAt": 1710840005000,
+  "metadata": {
+    "platform": "yuanbao",
+    "participantCount": 2,
+    "messageCount": 2
+  }
+}

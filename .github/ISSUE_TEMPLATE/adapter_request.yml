@@ -1,0 +1,78 @@
+name: 🔌 平台适配器请求
+description: 请求添加新的 AI 平台支持
+title: "[Adapter] 请求支持 [平台名称]"
+labels: ["adapter", "new-platform", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢推荐新平台！请提供以下信息帮助开发适配器。
+        
+        > 📚 开发指南：[适配器开发指南](https://github.com/your-repo/chat-export-toolkit/blob/main/docs/ADAPTERS.md)  
+        > 📋 当前支持：Yuanbao (L1), ChatGPT (L2)
+
+  - type: input
+    id: platform_name
+    attributes:
+      label: 平台名称
+      description: 例如：Kimi, 豆包，Claude, 文心一言等
+      placeholder: 平台名称
+    validations:
+      required: true
+
+  - type: input
+    id: platform_url
+    attributes:
+      label: 平台网址
+      description: 例如：https://kimi.moonshot.cn/
+      placeholder: https://
+    validations:
+      required: true
+
+  - type: textarea
+    id: api_info
+    attributes:
+      label: API 信息（如有）
+      description: 是否了解该平台的 API 端点或响应格式？
+      placeholder: 例如：对话列表 API、消息 API、响应结构等
+    validations:
+      required: false
+
+  - type: textarea
+    id: dom_info
+    attributes:
+      label: DOM 结构（如有）
+      description: 是否了解该页面的 DOM 结构？
+      placeholder: 例如：对话列表选择器、消息容器等
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 使用频率
+      description: 你使用该平台的频率？
+      options:
+        - 每天
+        - 每周几次
+        - 偶尔
+        - 很少
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: 贡献意愿
+      options:
+        - label: 我愿意协助测试适配器
+        - label: 我愿意提供 API/DOM 信息
+        - label: 我愿意尝试开发适配器（需指导）
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 确认事项
+      options:
+        - label: 已查看 [当前平台支持状态](https://github.com/your-repo/chat-export-toolkit/blob/main/README.md#-平台支持状态)
+        - label: 已搜索现有 Issue，无重复请求

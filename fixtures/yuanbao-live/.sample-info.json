@@ -1,0 +1,28 @@
+{
+  "platform": "yuanbao",
+  "capturedAt": "2026-03-19T10:20:16.316Z",
+  "capturedBy": "user",
+  "environment": {
+    "browser": "Chrome/Edge (请填写版本号)",
+    "os": "macOS/Windows/Linux (请填写版本)",
+    "userAgent": "Mozilla/5.0 ... (请填写完整 User-Agent)"
+  },
+  "apiVersion": "v2",
+  "endpoints": {
+    "detail": "/api/user/agent/conversation/v2/detail",
+    "list": "/api/user/agent/conversation/v2/list"
+  },
+  "sanitized": false,
+  "validated": false,
+  "notes": "请填写样本特点，如：包含 think 块、代码块、图片等",
+  "checklist": {
+    "detailResponse": false,
+    "listResponse": false,
+    "detailRequest": false,
+    "listRequest": false,
+    "screenshots": false,
+    "htmlSnapshots": false,
+    "sanitized": false,
+    "validated": false
+  }
+}

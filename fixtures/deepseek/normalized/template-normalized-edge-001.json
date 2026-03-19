@@ -1,0 +1,109 @@
+{
+  "_comment": "DeepSeek 边界情况标准化模板",
+  "_status": "TEMPLATE",
+  "_instructions": "此文件定义边界情况的预期标准化输出。",
+  
+  "id": "deepseek-edge-template-001",
+  "title": "DeepSeek 边界情况测试",
+  "messages": [
+    {
+      "id": "deepseek-edge-template-001_msg_msg-edge-001",
+      "role": "user",
+      "content": {
+        "text": "_No content_",
+        "metadata": {
+          "note": "空消息内容应转换为 _No content_"
+        }
+      },
+      "timestamp": 1710840000000,
+      "metadata": {
+        "platform": "deepseek",
+        "originalId": "msg-edge-001",
+        "originalRole": "user"
+      }
+    },
+    {
+      "id": "deepseek-edge-template-001_msg_msg-edge-002",
+      "role": "assistant",
+      "content": {
+        "text": "这是一条包含特殊字符和 emoji 的消息：🎉🚀 @#$%^&*() 你好世界",
+        "metadata": {
+          "note": "特殊字符和 emoji 应原样保留"
+        }
+      },
+      "timestamp": 1710840005000,
+      "metadata": {
+        "platform": "deepseek",
+        "originalId": "msg-edge-002",
+        "originalRole": "assistant"
+      }
+    },
+    {
+      "id": "deepseek-edge-template-001_msg_msg-edge-003",
+      "role": "user",
+      "content": {
+        "text": "测试数学公式：$E = mc^2$ 和块级公式 $$\\int_0^\\infty e^{-x^2} dx$$",
+        "metadata": {
+          "note": "LaTeX 数学公式应原样保留"
+        }
+      },
+      "timestamp": 1710840010000,
+      "metadata": {
+        "platform": "deepseek",
+        "originalId": "msg-edge-003",
+        "originalRole": "user"
+      }
+    },
+    {
+      "id": "deepseek-edge-template-001_msg_msg-edge-004",
+      "role": "assistant",
+      "content": {
+        "text": "_No content_",
+        "metadata": {
+          "note": "null 内容应转换为 _No content_"
+        }
+      },
+      "timestamp": 1710840015000,
+      "metadata": {
+        "platform": "deepseek",
+        "originalId": "msg-edge-004",
+        "originalRole": "assistant"
+      }
+    },
+    {
+      "id": "deepseek-edge-template-001_msg_msg-edge-005",
+      "role": "assistant",
+      "content": {
+        "text": "> [Reasoning]\n> 这是一个超长的推理过程，用于测试长推理内容的处理。这是一个超长的推理过程，用于测试长推理内容的处理。这是一个超长的推理过程，用于测试长推理内容的处理。\n\n超长消息测试：这是一段非常长的文本，用于测试长消息的处理。这是一段非常长的文本，用于测试长消息的处理。这是一段非常长的文本，用于测试长消息的处理。",
+        "metadata": {
+          "blockTypes": ["reasoning", "text"],
+          "hasReasoning": true,
+          "note": "超长内容应完整保留"
+        }
+      },
+      "timestamp": 1710840020000,
+      "metadata": {
+        "platform": "deepseek",
+        "originalId": "msg-edge-005",
+        "originalRole": "assistant",
+        "hasReasoning": true
+      }
+    }
+  ],
+  "createdAt": 1710840000000,
+  "updatedAt": 1710840020000,
+  "metadata": {
+    "platform": "deepseek",
+    "participantCount": 2,
+    "messageCount": 5,
+    "source": "template",
+    "edge_cases": [
+      "empty_content",
+      "special_characters",
+      "emoji",
+      "latex_formulas",
+      "null_content",
+      "long_content"
+    ]
+  }
+}

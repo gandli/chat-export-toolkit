@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Export Toolkit V2 - Integration Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 10px;
+    }
+    h2 {
+      color: #666;
+      margin-top: 30px;
+      font-size: 18px;
+    }
+    .status {
+      padding: 10px 15px;
+      border-radius: 4px;
+      margin: 10px 0;
+      font-family: monospace;
+      font-size: 13px;
+    }
+    .status.success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+    .status.error {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+    .status.info {
+      background: #d1ecf1;
+      border: 1px solid #bee5eb;
+      color: #0c5460;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    button.secondary {
+      background: #6c757d;
+    }
+    button.secondary:hover {
+      background: #545b62;
+    }
+    button.success {
+      background: #28a745;
+    }
+    button.success:hover {
+      background: #218838;
+    }
+    .code {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      overflow-x: auto;
+      margin: 10px 0;
+    }
+    .log {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+      margin: 10px 0;
+    }
+    .log-entry {
+      margin: 5px 0;
+      padding: 3px 0;
+      border-bottom: 1px solid #333;
+    }
+    .log-entry.error {
+      color: #f48771;
+    }
+    .log-entry.success {
+      color: #89d185;
+    }
+    .log-entry.info {
+      color: #6796e6;
+    }
+    .log-entry.warn {
+      color: #dcdcaa;
+    }
+    select {
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      margin: 5px;
+    }
+    .fixture-info {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      padding: 15px;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+    .fixture-info strong {
+      color: #333;
+    }
+    .test-section {
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 15px;
+      margin: 15px 0;
+      background: #fafafa;
+    }
+    .test-section h3 {
+      margin-top: 0;
+      color: #444;
+      font-size: 16px;
+    }
+    .inline-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 Chat Export Toolkit V2 - Integration Test</h1>
+    <p style="color: #666; font-size: 14px;">
+      本地 E2E 验证工具 - 测试初始化、UI 渲染、导出、格式切换和错误处理
+    </p>
+    
+    <div class="test-section" style="background: #e8f4fd; border-color: #b3d9ff;">
+      <h3 style="color: #0066cc;">🔗 Yuanbao 真实页面验证</h3>
+      <p style="font-size: 13px; color: #555; margin: 10px 0;">
+        需要在真实 Yuanbao 页面进行测试？查看以下资源：
+      </p>
+      <ul style="font-size: 13px; color: #555; margin: 10px 0; padding-left: 20px;">
+        <li>📖 <strong>验证指南:</strong> <code>docs/YUANBAO_LIVE_VALIDATION.md</code></li>
+        <li>🔧 <strong>样本采集:</strong> <code>bun run scripts/capture-yuanbao-samples.ts</code></li>
+        <li>✅ <strong>导出验证:</strong> <code>bun run scripts/validate-export.ts --file &lt;your-file&gt;</code></li>
+        <li>🏥 <strong>诊断报告:</strong> <code>bun run scripts/diagnose-yuanbao.ts</code></li>
+      </ul>
+      <p style="font-size: 12px; color: #777; margin: 10px 0;">
+        💡 <strong>提示:</strong> 真实页面验证需要登录态，本地测试页使用 demo 数据。
+      </p>
+    </div>
+    
+    <h2>1. 环境检查</h2>
+    <div id="env-check"></div>
+    
+    <h2>2. 加载 Userscript</h2>
+    <button onclick="loadUserscript()">📦 加载 userscript</button>
+    <div id="load-status"></div>
+    
+    <h2>3. 初始化 Toolkit</h2>
+    <button onclick="initToolkit()" id="btn-init" disabled>🚀 初始化</button>
+    <div id="init-status"></div>
+    
+    <h2>4. 测试导出（Demo 数据）</h2>
+    <div class="inline-controls">
+      <button onclick="testExport('json')" id="btn-export-json" disabled>📄 导出 JSON</button>
+      <button onclick="testExport('markdown')" id="btn-export-md" disabled>📝 导出 Markdown</button>
+    </div>
+    <div id="export-status"></div>
+    
+    <h2>5. Fixture 数据测试</h2>
+    <div class="test-section">
+      <h3>选择测试数据</h3>
+      <div class="inline-controls">
+        <select id="fixture-select" onchange="onFixtureChange()">
+          <option value="">-- 选择 Fixture --</option>
+          <optgroup label="主 Fixtures">
+            <option value="fixtures/sample-conversation.json">通用示例 (sample-conversation.json)</option>
+            <option value="fixtures/v2-normalized-conversation.json">V2 标准化 (v2-normalized-conversation.json)</option>
+          </optgroup>
+          <optgroup label="边界情况">
+            <option value="fixtures/edge-cases/empty-conversation.json">空对话 (empty-conversation.json)</option>
+            <option value="fixtures/edge-cases/single-message.json">单条消息 (single-message.json)</option>
+            <option value="fixtures/edge-cases/multiple-think-blocks.json">多个 Think 块 (multiple-think-blocks.json)</option>
+            <option value="fixtures/edge-cases/special-characters.json">特殊字符 (special-characters.json)</option>
+            <option value="fixtures/edge-cases/code-blocks.json">代码块 (code-blocks.json)</option>
+            <option value="fixtures/edge-cases/with-attachments.json">带附件 (with-attachments.json)</option>
+          </optgroup>
+        </select>
+        <button onclick="loadFixture()" id="btn-load-fixture" disabled>📥 加载 Fixture</button>
+        <button onclick="exportFixture()" id="btn-export-fixture" disabled>💾 导出 Fixture 数据</button>
+      </div>
+      <div id="fixture-info"></div>
+    </div>
+    
+    <h2>6. 错误处理测试</h2>
+    <div class="inline-controls">
+      <button onclick="testUninitialized()" class="secondary">⚠️ 测试未初始化导出</button>
+      <button onclick="testInvalidFormat()" class="secondary">⚠️ 测试无效格式</button>
+    </div>
+    <div id="error-status"></div>
+    
+    <h2>7. 控制台日志</h2>
+    <div class="inline-controls">
+      <button onclick="clearLogs()" class="secondary">🗑️ 清空日志</button>
+      <button onclick="downloadLogs()" class="secondary">💾 下载日志</button>
+    </div>
+    <div class="log" id="log-container"></div>
+  </div>
+
+  <script>
+    // 全局状态
+    let testToolkit = null;
+    let currentFixture = null;
+    const logContainer = document.getElementById('log-container');
+    
+    // 日志工具
+    function addLog(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      const timestamp = new Date().toLocaleTimeString();
+      entry.textContent = `[${timestamp}] ${message}`;
+      logContainer.appendChild(entry);
+      logContainer.scrollTop = logContainer.scrollHeight;
+      console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+    
+    function clearLogs() {
+      logContainer.innerHTML = '';
+      addLog('日志已清空', 'info');
+    }
+    
+    function downloadLogs() {
+      const logText = Array.from(logContainer.querySelectorAll('.log-entry'))
+        .map(e => e.textContent)
+        .join('\n');
+      const blob = new Blob([logText], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `test-logs-${Date.now()}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+      addLog('日志已下载', 'success');
+    }
+    
+    function setStatus(elementId, message, type) {
+      const el = document.getElementById(elementId);
+      el.innerHTML = `<div class="status ${type}">${message}</div>`;
+    }
+    
+    // 1. 环境检查
+    addLog('开始环境检查...', 'info');
+    const envCheck = document.getElementById('env-check');
+    envCheck.innerHTML = `
+      <div class="status info">
+        <strong>User Agent:</strong> ${navigator.userAgent}<br>
+        <strong>LocalStorage:</strong> ${typeof localStorage !== 'undefined' ? '✅ Available' : '❌ Unavailable'}<br>
+        <strong>Fetch API:</strong> ${typeof fetch !== 'undefined' ? '✅ Available' : '❌ Unavailable'}<br>
+        <strong>DOM:</strong> ${typeof document !== 'undefined' ? '✅ Available' : '❌ Unavailable'}<br>
+        <strong>当前页面:</strong> ${window.location.href}
+      </div>
+    `;
+    addLog('环境检查完成', 'success');
+    
+    // 2. 加载 Userscript
+    function loadUserscript() {
+      addLog('正在加载 userscript...', 'info');
+      
+      const script = document.createElement('script');
+      script.src = './userscripts/chat-export.v2.user.js';
+      script.onload = () => {
+        setStatus('load-status', '✅ Userscript 加载成功', 'success');
+        addLog('Userscript 加载成功', 'success');
+        document.getElementById('btn-init').disabled = false;
+        document.getElementById('btn-load-fixture').disabled = false;
+      };
+      script.onerror = () => {
+        setStatus('load-status', '❌ Userscript 加载失败 - 请确保在 HTTP 服务器上运行（而非 file://）', 'error');
+        addLog('Userscript 加载失败 - CORS 限制？尝试使用 bun run scripts/serve-test.ts', 'error');
+      };
+      document.head.appendChild(script);
+    }
+    
+    // 3. 初始化 Toolkit
+    async function initToolkit() {
+      addLog('正在初始化 Toolkit...', 'info');
+      
+      try {
+        if (typeof window.ChatExportToolkit === 'undefined') {
+          throw new Error('ChatExportToolkit 未定义');
+        }
+        
+        testToolkit = new window.ChatExportToolkit();
+        window.testToolkit = testToolkit;
+        
+        await testToolkit.init({
+          platform: 'yuanbao',
+          autoDetect: false,
+          ui: {
+            callbacks: {
+              onExportStart: (options) => {
+                addLog(`导出开始：${JSON.stringify(options)}`, 'info');
+              },
+              onExportComplete: (result) => {
+                addLog(`导出完成：${JSON.stringify(result)}`, 'success');
+                setStatus('export-status', `✅ 导出成功：${result.outputPath || '文件已生成'}`, 'success');
+              },
+              onExportError: (error) => {
+                addLog(`导出失败：${error.message}`, 'error');
+                setStatus('export-status', `❌ 导出失败：${error.message}`, 'error');
+              }
+            }
+          }
+        });
+        
+        setStatus('init-status', '✅ Toolkit 初始化成功', 'success');
+        addLog('Toolkit 初始化成功', 'success');
+        addLog(`环境：${testToolkit.getRuntime()?.capabilities.environment}`, 'info');
+        addLog(`平台：${testToolkit.detectPlatform()}`, 'info');
+        
+        document.getElementById('btn-export-json').disabled = false;
+        document.getElementById('btn-export-md').disabled = false;
+        document.getElementById('btn-export-fixture').disabled = false;
+        
+      } catch (error) {
+        setStatus('init-status', `❌ 初始化失败：${error.message}`, 'error');
+        addLog(`初始化失败：${error.message}`, 'error');
+      }
+    }
+    
+    // 4. 测试导出
+    async function testExport(format) {
+      addLog(`开始导出 ${format.toUpperCase()}...`, 'info');
+      setStatus('export-status', `正在导出 ${format.toUpperCase()}...`, 'info');
+      
+      try {
+        if (!testToolkit) {
+          throw new Error('Toolkit 未初始化');
+        }
+        
+        const result = await testToolkit.exportCurrentConversation(format);
+        
+        if (result.success) {
+          setStatus('export-status', `✅ 导出成功`, 'success');
+          addLog(`导出成功`, 'success');
+        } else {
+          setStatus('export-status', `❌ 导出失败：${result.error}`, 'error');
+          addLog(`导出失败：${result.error}`, 'error');
+        }
+      } catch (error) {
+        setStatus('export-status', `❌ 导出异常：${error.message}`, 'error');
+        addLog(`导出异常：${error.message}`, 'error');
+      }
+    }
+    
+    // 5. Fixture 数据测试
+    function onFixtureChange() {
+      const select = document.getElementById('fixture-select');
+      const btnLoad = document.getElementById('btn-load-fixture');
+      btnLoad.disabled = !select.value;
+      
+      if (select.value) {
+        addLog(`已选择 fixture: ${select.value}`, 'info');
+      }
+    }
+    
+    async function loadFixture() {
+      const select = document.getElementById('fixture-select');
+      const fixturePath = select.value;
+      
+      if (!fixturePath) {
+        addLog('请先选择 fixture', 'warn');
+        return;
+      }
+      
+      try {
+        addLog(`正在加载 fixture: ${fixturePath}`, 'info');
+        const response = await fetch(fixturePath);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        currentFixture = await response.json();
+        
+        const infoDiv = document.getElementById('fixture-info');
+        infoDiv.innerHTML = `
+          <div class="fixture-info">
+            <strong>ID:</strong> ${currentFixture.id}<br>
+            <strong>标题:</strong> ${currentFixture.title}<br>
+            <strong>消息数:</strong> ${currentFixture.messages.length}<br>
+            <strong>平台:</strong> ${currentFixture.metadata?.platform || '未知'}<br>
+            ${currentFixture.messages.length === 0 ? '<strong>类型:</strong> 空对话<br>' : ''}
+            ${currentFixture.messages.some(m => m.content?.text?.includes('[Think]')) ? '<strong>包含:</strong> Think 块<br>' : ''}
+            ${currentFixture.messages.some(m => m.content?.attachments?.length > 0) ? '<strong>包含:</strong> 附件<br>' : ''}
+          </div>
+        `;
+        
+        addLog(`Fixture 加载成功：${currentFixture.messages.length} 条消息`, 'success');
+        document.getElementById('btn-export-fixture').disabled = false;
+        
+      } catch (error) {
+        addLog(`Fixture 加载失败：${error.message}`, 'error');
+        currentFixture = null;
+      }
+    }
+    
+    async function exportFixture() {
+      if (!currentFixture) {
+        addLog('请先加载 fixture', 'warn');
+        return;
+      }
+      
+      if (!testToolkit) {
+        addLog('Toolkit 未初始化', 'error');
+        return;
+      }
+      
+      try {
+        addLog('导出 fixture 数据...', 'info');
+        
+        // 使用 Normalizer 标准化数据
+        const normalizer = testToolkit.normalizer;
+        if (!normalizer) {
+          throw new Error('Normalizer 未初始化');
+        }
+        
+        const normalized = await normalizer.normalizeConversation({
+          id: currentFixture.id,
+          data: currentFixture,
+        });
+        
+        addLog(`标准化完成：${normalized.messages.length} 条消息`, 'success');
+        
+        // 导出为 JSON
+        const exporter = testToolkit.exporter;
+        if (!exporter) {
+          throw new Error('Exporter 未初始化');
+        }
+        
+        const result = await exporter.exportConversation(normalized, {
+          format: 'json',
+          includeMetadata: true,
+          filename: `fixture-${currentFixture.id}.json`,
+        });
+        
+        if (result.success) {
+          addLog('Fixture 导出成功', 'success');
+          setStatus('export-status', '✅ Fixture 导出成功', 'success');
+        } else {
+          throw new Error(result.error);
+        }
+        
+      } catch (error) {
+        addLog(`Fixture 导出失败：${error.message}`, 'error');
+        setStatus('export-status', `❌ Fixture 导出失败：${error.message}`, 'error');
+      }
+    }
+    
+    // 6. 错误处理测试
+    async function testUninitialized() {
+      addLog('测试未初始化导出...', 'warn');
+      
+      try {
+        const tempToolkit = new window.ChatExportToolkit();
+        await tempToolkit.exportCurrentConversation('json');
+        addLog('⚠️ 应该抛出错误但未抛出', 'error');
+        setStatus('error-status', '⚠️ 未初始化时应该抛出错误', 'error');
+      } catch (error) {
+        addLog(`预期错误：${error.message}`, 'success');
+        setStatus('error-status', `✅ 正确抛出错误：${error.message}`, 'success');
+      }
+    }
+    
+    async function testInvalidFormat() {
+      if (!testToolkit) {
+        addLog('请先初始化 Toolkit', 'warn');
+        return;
+      }
+      
+      addLog('测试无效格式导出...', 'warn');
+      
+      try {
+        const result = await testToolkit.exportCurrentConversation('invalid-format');
+        if (!result.success) {
+          addLog(`预期错误：${result.error}`, 'success');
+          setStatus('error-status', `✅ 正确处理无效格式：${result.error}`, 'success');
+        } else {
+          addLog('⚠️ 应该返回错误但成功了', 'error');
+        }
+      } catch (error) {
+        addLog(`预期错误：${error.message}`, 'success');
+        setStatus('error-status', `✅ 正确抛出错误：${error.message}`, 'success');
+      }
+    }
+    
+    addLog('页面加载完成，等待用户操作', 'info');
+  </script>
+</body>
+</html>
