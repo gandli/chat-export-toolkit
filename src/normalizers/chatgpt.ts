@@ -379,16 +379,47 @@ export class ChatGPTRNormalizer extends BaseNormalizer {
     mapping: Record<string, any>
   ): ChatGPTMessage[] {
     const messages: ChatGPTMessage[] = [];
+    const visited = new Set<string>();
 
-    for (const key of Object.keys(mapping)) {
-      const node = mapping[key];
-      if (node?.message) {
+    const visit = (nodeId: string): void => {
+      if (visited.has(nodeId)) {
+        return;
+      }
+
+      visited.add(nodeId);
+
+      const node = mapping[nodeId];
+      if (!node) {
+        return;
+      }
+
+      if (node.message) {
         messages.push(node.message as ChatGPTMessage);
+      }
+
+      const children = Array.isArray(node.children) ? node.children : [];
+      for (const childId of children) {
+        if (typeof childId === 'string') {
+          visit(childId);
+        }
+      }
+    };
+
+    for (const [nodeId, node] of Object.entries(mapping)) {
+      if (!node?.parent || !mapping[node.parent]) {
+        visit(nodeId);
       }
     }
 
-    // TODO: 如果需要保持顺序，需要根据 parent/children 关系重建顺序
-    return messages;
+    for (const nodeId of Object.keys(mapping)) {
+      visit(nodeId);
+    }
+
+    return messages.sort((a, b) => {
+      const left = this.parseTimestamp(a.timestamp || a.createTime || 0);
+      const right = this.parseTimestamp(b.timestamp || b.createTime || 0);
+      return left - right;
+    });
   }
 
   /**

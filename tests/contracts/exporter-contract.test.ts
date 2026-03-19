@@ -20,7 +20,7 @@ import {
   DocxExporter,
   ZIPExporter,
 } from '../../src/exporters';
-import type { Conversation, ExportOptions, ExportResult } from '../../src/types';
+import type { Conversation, ExportOptions } from '../../src/types';
 
 // ============================================================================
 // Fixture Helpers
@@ -364,11 +364,13 @@ describe('Exporter Contract Tests', () => {
 
       // V1 格式
       const resultV1 = await exporter.exportConversation(conversation, {
+        format: 'markdown',
         formatVersion: 'v1',
       });
 
       // V2 格式
       const resultV2 = await exporter.exportConversation(conversation, {
+        format: 'markdown',
         formatVersion: 'v2',
       });
 
@@ -560,14 +562,12 @@ describe('Exporter Contract Tests', () => {
         new MarkdownExporter(),
       ];
 
-      // @ts-expect-error - 测试无效输入
-      const invalidConversation = null;
       const options: ExportOptions = { format: 'json' };
 
       for (const exporter of exporters) {
         try {
           const result = await exporter.exportConversation(
-            invalidConversation,
+            null as unknown as Conversation,
             options
           );
           // 应该返回错误结果而不是抛出异常
@@ -585,7 +585,6 @@ describe('Exporter Contract Tests', () => {
         new MarkdownExporter(),
       ];
 
-      // @ts-expect-error - 测试缺失字段
       const incompleteConversation: Partial<Conversation> = {
         id: 'incomplete-001',
         // 缺失 title, messages, createdAt, updatedAt

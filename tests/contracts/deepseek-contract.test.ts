@@ -10,11 +10,11 @@
  * 注意：这些测试不依赖真实 DOM 或网络请求，使用 fake input / fixture
  */
 
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { DeepSeekAdapter } from '../../src/adapters/deepseek';
 import { DeepSeekNormalizer } from '../../src/normalizers/deepseek';
 import type { IPlatformAdapter } from '../../src/core';
-import type { PlatformType, RawConversation, RawMessage, Conversation } from '../../src/types';
+import type { PlatformType, RawConversation, RawMessage } from '../../src/types';
 import {
   createFakeRawConversation,
   createEmptyRawConversation,

@@ -60,10 +60,6 @@ describe('Yuanbao Golden Tests', () => {
         readFileSync(join(fixturesDir, 'raw/edge-case-001.json'), 'utf-8')
       );
 
-      const expectedNormalized: Conversation = JSON.parse(
-        readFileSync(join(fixturesDir, 'normalized/normalized-edge-001.json'), 'utf-8')
-      );
-
       const result = await normalizer.normalizeConversation(rawData);
 
       // 验证消息数量

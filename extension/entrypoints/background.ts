@@ -1,5 +1,5 @@
+import { registerBackgroundMessageListener } from '../src/background/main';
+
 export default defineBackground(() => {
-  chrome.runtime.onInstalled?.addListener(() => {
-    console.log('[Chat Export Toolkit] browser extension MVP installed');
-  });
+  registerBackgroundMessageListener();
 });

@@ -13,7 +13,7 @@
  * - 时间戳边界情况
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { YuanbaoNormalizer, yuanbaoToMarkdown } from '../../../src/normalizers/yuanbao';
 import { MarkdownExporter } from '../../../src/exporters/markdown';
 import type { RawConversation, Conversation } from '../../../src/types';
@@ -836,6 +836,7 @@ describe('Yuanbao Edge Cases & Security Tests', () => {
       };
 
       const result = await exporter.exportConversation(conversation, {
+        format: 'markdown',
         formatVersion: 'v1',
       });
 
@@ -859,6 +860,7 @@ describe('Yuanbao Edge Cases & Security Tests', () => {
       };
 
       const result = await exporter.exportConversation(conversation, {
+        format: 'markdown',
         formatVersion: 'v2',
       });
 
@@ -891,6 +893,7 @@ describe('Yuanbao Edge Cases & Security Tests', () => {
       };
 
       const result = await exporter.exportConversation(conversation, {
+        format: 'markdown',
         formatVersion: 'v1',
       });
 

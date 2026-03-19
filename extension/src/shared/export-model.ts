@@ -35,6 +35,7 @@ export interface ExportResponse {
   ok: boolean;
   provider?: ProviderStatus;
   conversation?: Pick<ExtensionConversation, 'id' | 'title'>;
+  download?: DownloadPayload;
   error?: string;
 }
 

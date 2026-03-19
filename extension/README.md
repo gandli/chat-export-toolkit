@@ -10,7 +10,7 @@
 - 已有 `background`
 - 已建立统一消息协议和导出模型引用
 - 已有 `provider` 抽象
-- 已接入 `ChatGPT` 当前对话导出骨架
+- 已接入 `ChatGPT` 当前对话导出链路
 
 ## MVP 范围
 
@@ -28,11 +28,37 @@ popup
 content script
   -> provider detection
   -> provider.collectCurrentConversation()
-  -> root exporters
-  -> browser download
+  -> root normalizers / exporters
+  -> export payload
+popup
+  -> chrome.runtime.sendMessage()
+background
+  -> chrome.downloads.download()
 background
   -> MV3 service worker bootstrap
 ```
+
+## 当前可用能力
+
+- 支持站点：`chat.openai.com`、`chatgpt.com`
+- 导出对象：当前对话
+- 导出格式：`JSON`、`Markdown`
+- 当前链路：`popup -> content provider -> root exporter -> background download`
+- ChatGPT 抓取策略：
+  - 优先尝试当前站点同源 API 拉取当前会话详情
+  - API 不可用时回退到 DOM 提取可见消息
+  - `mapping` 结构已按树顺序重建，避免消息乱序
+
+## 本轮落地内容
+
+- 让根目录 `JSONExporter` / `MarkdownExporter` 在扩展场景下可返回导出文本，不再只做浏览器直接下载
+- 打通 popup 到 content 的导出请求，以及 content 到 background 的下载请求
+- 为 `ExportResponse` 增加下载载荷，真正把文件落到浏览器下载
+- 补强 `ChatGPTAdapter`：
+  - 支持 `chatgpt.com`
+  - 尝试通过同源接口获取当前会话详情/列表
+  - 统一解析常见响应包裹层
+- 补强 `ChatGPTRNormalizer` 的 `mapping` 顺序重建
 
 ## 复用策略
 
@@ -57,7 +83,7 @@ bun run build:extension
 
 ## 下一步
 
-- 补强 ChatGPT API 捕获链路，降低 DOM 依赖
+- 在真实 ChatGPT 页面手测 API 分支是否稳定可用，记录样本
 - 追加 Claude / Kimi / 元宝 provider
 - 增加“导出全部对话”和导出偏好设置
-- 做 popup -> content -> exporter 的端到端验证
+- 增加页面内提示，区分 API 导出与 DOM fallback

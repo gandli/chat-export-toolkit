@@ -32,6 +32,7 @@ declare global {
         ) => boolean | void
       ): void;
     };
+    sendMessage(message: unknown): Promise<unknown>;
     lastError?: {
       message: string;
     };

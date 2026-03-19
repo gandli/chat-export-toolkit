@@ -43,19 +43,22 @@ export class MarkdownExporter extends BaseExporter {
 
       // 生成文件名
       const filename = options.filename || this.generateFilename(conversation, 'md');
+      const mimeType = 'text/markdown;charset=utf-8';
 
-      // 在浏览器环境中触发下载（Node.js 环境中跳过）
-      const blob = this.createBlob(markdownContent, 'text/markdown');
-      this.triggerDownload(blob, filename);
+      if (options.download !== false) {
+        const blob = this.createBlob(markdownContent, mimeType);
+        this.triggerDownload(blob, filename);
       
-      // Node.js 环境：记录生成的文件信息
-      if (!blob) {
-        console.log(`[MarkdownExporter] Generated: ${filename} (${markdownContent.length} bytes)`);
+        if (!blob) {
+          console.log(`[MarkdownExporter] Generated: ${filename} (${markdownContent.length} bytes)`);
+        }
       }
 
       return {
         success: true,
         outputPath: filename,
+        content: markdownContent,
+        mimeType,
         stats: {
           messageCount: conversation.messages.length,
           conversationCount: 1,

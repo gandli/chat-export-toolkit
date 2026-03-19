@@ -116,6 +116,7 @@ export interface RawConversation {
 export type ExportFormat = 
   | 'json'
   | 'markdown'
+  | 'docx'
   | 'html'
   | 'pdf'
   | 'txt'
@@ -129,6 +130,7 @@ export interface ExportOptions {
   format: ExportFormat;
   outputDir?: string;
   filename?: string;
+  download?: boolean;
   includeMetadata?: boolean;
   includeAttachments?: boolean;
   dateRange?: {
@@ -147,6 +149,8 @@ export interface ExportOptions {
 export interface ExportResult {
   success: boolean;
   outputPath?: string;
+  content?: string;
+  mimeType?: string;
   error?: string;
   stats?: {
     messageCount: number;
@@ -235,5 +239,3 @@ export interface UIEvents {
  * UI 配置
  */
 export interface UIConfig extends UIComponentProps, UIEvents {}
-
-

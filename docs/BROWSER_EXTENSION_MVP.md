@@ -19,7 +19,7 @@
 
 ### 已支持的平台
 
-- ChatGPT：当前对话导出骨架，优先走 adapter + normalizer，失败时回退 DOM 提取
+- ChatGPT：已打通当前对话导出链路，优先走 adapter + normalizer，失败时回退 DOM 提取
 
 ### 计划支持的平台
 
@@ -46,12 +46,16 @@ popup
 content script
   -> detectProvider(window.location)
   -> provider.collectCurrentConversation()
-  -> root exporter
-  -> 触发浏览器下载
+  -> root normalizer / exporter
+  -> 返回下载载荷
+
+popup
+  -> 调 content script 导出
+  -> 调 background 执行下载
 
 background
   -> MV3 service worker 入口
-  -> 保留后续下载编排、设置同步、批量任务入口
+  -> chrome.downloads.download()
 ```
 
 ## 代码分层
@@ -81,18 +85,22 @@ background
 - 落地 `ChatGPTExtensionProvider`
 - 复用 `ChatGPTAdapter + ChatGPTRNormalizer + root exporters`
 - 为 ChatGPT 保留 DOM fallback，避免 API 路径失效时完全不可用
+- 让 `JSONExporter` / `MarkdownExporter` 在扩展场景返回 `content + mimeType`
+- 打通 `popup -> content -> exporter -> background download` 实际下载链路
+- 补强 ChatGPT `mapping` 顺序重建，降低消息乱序风险
 
 ## 已知限制
 
 - ChatGPT DOM fallback 仅覆盖常见文本结构
+- API 路径仍需在真实 ChatGPT 页面继续采样验证
 - 还没有“导出全部对话”
 - 还没有设置页
-- 背景脚本目前只保留 MVP service worker 入口，未承担复杂任务编排
+- 背景脚本目前只承担下载，不做复杂任务编排
 - 其他平台 provider 仍是计划项
 
 ## 下一步建议
 
-1. 补 ChatGPT API 捕获链路，提升稳定性
+1. 在真实 ChatGPT 页面验证 API 分支与 DOM fallback 的覆盖情况
 2. 追加 Claude / Kimi / 元宝 provider，形成第一批跨站点 MVP
 3. 用 `chrome.storage` 保存导出格式、文件名策略等偏好
 4. 增加扩展级集成测试，覆盖 popup -> content -> provider -> exporter

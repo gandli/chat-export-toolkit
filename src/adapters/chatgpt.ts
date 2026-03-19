@@ -18,7 +18,11 @@ import type {
   ChatGPTConversationListItem,
   ChatGPTMessage,
 } from './chatgpt-types';
-import { CHATGPT_URL_PATTERNS } from './chatgpt-types';
+import {
+  CHATGPT_DETAIL_ENDPOINT_CANDIDATES,
+  CHATGPT_LIST_ENDPOINT_CANDIDATES,
+  CHATGPT_URL_PATTERNS,
+} from './chatgpt-types';
 import type { PlatformType, RawConversation, RawMessage } from '../types';
 
 /**
@@ -61,12 +65,12 @@ export class ChatGPTAdapter extends BasePlatformAdapter {
     const hostname = window.location.hostname;
     
     // 主要域名检测
-    if (hostname === 'chat.openai.com') {
+    if (hostname === 'chat.openai.com' || hostname === 'chatgpt.com') {
       return true;
     }
     
     // 备用域名检测
-    if (hostname.endsWith('.openai.com') || hostname === 'chat.com') {
+    if (hostname.endsWith('.openai.com')) {
       return true;
     }
     
@@ -325,16 +329,23 @@ export class ChatGPTAdapter extends BasePlatformAdapter {
    * TODO: 需要实现实际的 fetch 逻辑
    */
   private async fetchConversationDetail(
-    _conversationId: string
+    conversationId: string
   ): Promise<ChatGPTConversationDetail | null> {
     const endpoints = await this.discoverApiEndpoints();
-    if (!endpoints.detail) {
-      throw new Error('Detail API endpoint not available');
+    const endpointCandidates = this.buildDetailEndpointCandidates(
+      conversationId,
+      endpoints.detail
+    );
+
+    for (const endpoint of endpointCandidates) {
+      const detail = await this.fetchJson(endpoint);
+      const conversation = this.unwrapConversationDetail(detail, conversationId);
+
+      if (conversation) {
+        return conversation;
+      }
     }
 
-    // TODO: 实现实际的 fetch 逻辑
-    // 目前返回 null，等待后续实现
-    console.warn('[ChatGPTAdapter] fetchConversationDetail not fully implemented');
     return null;
   }
 
@@ -345,13 +356,17 @@ export class ChatGPTAdapter extends BasePlatformAdapter {
    */
   private async fetchConversationList(): Promise<ChatGPTConversationListItem[] | null> {
     const endpoints = await this.discoverApiEndpoints();
-    if (!endpoints.list) {
-      throw new Error('List API endpoint not available');
+    const endpointCandidates = this.buildListEndpointCandidates(endpoints.list);
+
+    for (const endpoint of endpointCandidates) {
+      const payload = await this.fetchJson(endpoint);
+      const items = this.unwrapConversationList(payload);
+
+      if (items.length > 0) {
+        return items;
+      }
     }
 
-    // TODO: 实现实际的 fetch 逻辑
-    // 目前返回 null，等待后续实现
-    console.warn('[ChatGPTAdapter] fetchConversationList not fully implemented');
     return null;
   }
 
@@ -471,16 +486,164 @@ export class ChatGPTAdapter extends BasePlatformAdapter {
   ): ChatGPTMessage[] {
     const messages: ChatGPTMessage[] = [];
 
-    // 遍历 mapping 中的所有节点
-    for (const key of Object.keys(mapping)) {
-      const node = mapping[key];
-      if (node?.message) {
+    const visited = new Set<string>();
+    const visit = (nodeId: string): void => {
+      if (visited.has(nodeId)) {
+        return;
+      }
+
+      visited.add(nodeId);
+
+      const node = mapping[nodeId];
+      if (!node) {
+        return;
+      }
+
+      if (node.message) {
         messages.push(node.message as ChatGPTMessage);
+      }
+
+      const children = Array.isArray(node.children) ? node.children : [];
+      for (const childId of children) {
+        if (typeof childId === 'string') {
+          visit(childId);
+        }
+      }
+    };
+
+    for (const [nodeId, node] of Object.entries(mapping)) {
+      if (!node?.parent || !mapping[node.parent]) {
+        visit(nodeId);
       }
     }
 
-    // TODO: 如果需要保持顺序，需要根据 parent/children 关系重建顺序
+    for (const nodeId of Object.keys(mapping)) {
+      visit(nodeId);
+    }
+
     return messages;
+  }
+
+  private buildDetailEndpointCandidates(
+    conversationId: string,
+    discoveredEndpoint: string | null
+  ): string[] {
+    const candidates = [
+      discoveredEndpoint,
+      ...CHATGPT_DETAIL_ENDPOINT_CANDIDATES,
+    ].filter((candidate): candidate is string => Boolean(candidate));
+
+    return Array.from(
+      new Set(
+        candidates.map((candidate) => {
+          if (candidate.includes('[id]')) {
+            return candidate.replace('[id]', conversationId);
+          }
+
+          return candidate.endsWith(`/${conversationId}`)
+            ? candidate
+            : `${candidate.replace(/\/$/, '')}/${conversationId}`;
+        })
+      )
+    );
+  }
+
+  private buildListEndpointCandidates(discoveredEndpoint: string | null): string[] {
+    return Array.from(
+      new Set(
+        [discoveredEndpoint, ...CHATGPT_LIST_ENDPOINT_CANDIDATES].filter(
+          (candidate): candidate is string => Boolean(candidate)
+        )
+      )
+    );
+  }
+
+  private async fetchJson(endpoint: string): Promise<unknown> {
+    try {
+      const response = await fetch(endpoint, {
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.warn('[ChatGPTAdapter] Failed to fetch endpoint:', endpoint, error);
+      return null;
+    }
+  }
+
+  private unwrapConversationDetail(
+    payload: unknown,
+    conversationId: string
+  ): ChatGPTConversationDetail | null {
+    if (!payload || typeof payload !== 'object') {
+      return null;
+    }
+
+    const queue: unknown[] = [payload];
+
+    while (queue.length > 0) {
+      const current = queue.shift();
+      if (!current || typeof current !== 'object') {
+        continue;
+      }
+
+      const candidate = current as ChatGPTConversationDetail;
+      if (Array.isArray(candidate.messages) || candidate.mapping) {
+        return {
+          ...candidate,
+          conversation_id: candidate.conversation_id || candidate.id || conversationId,
+        };
+      }
+
+      if ('conversation' in candidate) {
+        queue.push(candidate.conversation);
+      }
+      if ('data' in candidate) {
+        queue.push(candidate.data);
+      }
+      if ('result' in candidate) {
+        queue.push(candidate.result);
+      }
+    }
+
+    return null;
+  }
+
+  private unwrapConversationList(payload: unknown): ChatGPTConversationListItem[] {
+    if (!payload) {
+      return [];
+    }
+
+    if (Array.isArray(payload)) {
+      return payload as ChatGPTConversationListItem[];
+    }
+
+    if (typeof payload !== 'object') {
+      return [];
+    }
+
+    const list = payload as ChatGPTConversationList;
+    if (Array.isArray(list.items)) {
+      return list.items;
+    }
+    if (Array.isArray(list.conversation_items)) {
+      return list.conversation_items;
+    }
+    if (Array.isArray(list.data)) {
+      return list.data as ChatGPTConversationListItem[];
+    }
+    if (Array.isArray(list.result)) {
+      return list.result as ChatGPTConversationListItem[];
+    }
+
+    return [];
   }
 
   // ============================================================================

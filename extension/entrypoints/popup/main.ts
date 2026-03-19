@@ -1,4 +1,5 @@
 import type {
+  DownloadResponse,
   ExportResponse,
   ExtensionMessageRequest,
   StatusResponse,
@@ -49,6 +50,21 @@ async function exportCurrent(format: 'json' | 'markdown'): Promise<void> {
 
   if (!response?.ok) {
     setResult(response?.error || '导出失败。');
+    return;
+  }
+
+  if (!response.download) {
+    setResult('导出结果为空，未生成文件。');
+    return;
+  }
+
+  const downloadResponse = await chrome.runtime.sendMessage({
+    type: EXTENSION_MESSAGE_TYPES.download,
+    payload: response.download,
+  }) as DownloadResponse;
+
+  if (!downloadResponse?.ok) {
+    setResult(downloadResponse?.error || '下载失败。');
     return;
   }
 
