@@ -13,6 +13,10 @@
 
 ---
 
+🌐 **在线介绍页**: [gandli.github.io/chat-export-toolkit](https://gandli.github.io/chat-export-toolkit/)
+
+---
+
 ## ✨ 核心特性
 
 - **🔌 可扩展架构** — 基于适配器模式，支持为不同 AI 平台添加导出支持
@@ -58,9 +62,11 @@
 #### 直接使用（推荐）
 
 1. 确保浏览器已安装 Tampermonkey 扩展
-2. 打开 [`userscripts/chat-export.v2.user.js`](userscripts/chat-export.v2.user.js) 的 Raw 页面，点击安装
-3. 访问对应平台网站（如 [腾讯元宝](https://yuanbao.tencent.com/)）
-4. 页面右下角会出现导出按钮
+2. 从源码构建脚本：`bun install && bun run build`，产物为 `userscripts/chat-export.v2.user.js`
+3. 在 Tampermonkey 中新建脚本，粘贴构建产物内容并保存
+4. 访问对应平台网站（如 [腾讯元宝](https://yuanbao.tencent.com/)），页面右下角会出现导出按钮
+
+> 也可以加载 `extension/` 目录的 Chrome MV3 扩展版本（`extension/.output/chrome-mv3/`）。
 
 #### 开发/构建
 
@@ -87,7 +93,7 @@ bun run typecheck
 
 ## 📂 目录结构
 
-```
+```text
 chat-export-toolkit/
 ├── src/
 │   ├── index.ts              # 主入口 (ChatExportToolkit 类)
@@ -132,7 +138,7 @@ chat-export-toolkit/
 
 ### 数据流
 
-```
+```text
 页面加载
    ↓
 RuntimeBridge 初始化 (环境检测)
